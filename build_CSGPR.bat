@@ -3,26 +3,30 @@ setlocal ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 
 REM ===============================================================
 REM  Chromatic Scale Generator PLUS! (REMASTERED) - Build Script
-REM  Output: dist\chromatic_gen_qt_plus_modular_i18n\*.exe
+REM  Entry: CSGPR.py
+REM  Output: dist\CSGPR\CSGPR.exe
 REM ===============================================================
 
-REM Change to the directory of this script
 cd /d "%~dp0"
 
+set PYTHONUTF8=1
 set APP=CSGPR.py
-set ICON=C:\Users\Administrator\Downloads\CSGR\icon.ico
+set ICON=icon.ico
 
 if not exist "%APP%" (
   echo [ERROR] Cannot find %APP% in %cd%
   exit /b 1
 )
+if not exist "%ICON%" (
+  echo [WARN] Icon not found: "%ICON%". The build will continue without a custom icon.
+)
 
 echo [1/5] Creating/using virtual environment: .venv_build
 if not exist ".venv_build" (
-  py -3 -m venv .venv_build
+  py -3 -m venv .venv_build || python -m venv .venv_build
 )
 
-echo [2/5] Activating venv
+echo [2/5] Activating virtual environment
 call ".venv_build\Scripts\activate.bat"
 
 echo [2.1] Upgrading pip/setuptools/wheel
@@ -36,11 +40,8 @@ if exist requirements.txt (
 )
 
 echo [4/5] Building (onedir, windowed, no UPX)...
-REM Notes:
-REM  - onedir is friendlier to antivirus than onefile
-REM  - --collect-all ensures native libs for numpy / parselmouth come along
-REM  - remove --collect-all if you want a smaller build and it still works
 pyinstaller --noconfirm --clean --windowed --noupx ^
+  --name CSGPR ^
   --collect-all numpy ^
   --collect-all parselmouth ^
   --icon="%ICON%" "%APP%"
@@ -58,6 +59,6 @@ echo   dist\CSGPR\CSGPR.exe
 
 echo.
 echo [Optional] Build single-file EXE (may trigger more antivirus flags):
-echo   pyinstaller --noconfirm --clean --onefile --windowed --noupx --collect-all numpy --collect-all parselmouth --icon="%ICON%" "%APP%"
+echo   pyinstaller --noconfirm --clean --onefile --windowed --noupx --name CSGPR --collect-all numpy --collect-all parselmouth --icon="%ICON%" "%APP%"
 echo.
 pause
