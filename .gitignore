@@ -1,0 +1,58 @@
+# -------------------------------------
+# Chromatic Scale Generator PLUS! (Remastered)
+# Clean .gitignore for Python + PyInstaller apps
+# -------------------------------------
+
+# Python cache / compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+.venv/
+.venv_build/
+env/
+venv/
+ENV/
+
+# PyInstaller build folders
+build/
+dist/
+*.spec
+*.egg-info/
+
+# Logs and debug
+run.log
+*.log
+
+# Editor / system junk
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Temporary or old files
+*.tmp
+*.bak
+*.old
+*.orig
+*.swp
+*.swo
+
+# Windows-specific extras
+*.exe
+*.dll
+*.pdb
+*.manifest
+*.user
+
+# Do NOT ignore these (your actual app files)
+!icon.ico
+!i18n_pkg/
+!CSGPR.py
+!build_chromatic_plus.bat
+!run_with_logs.bat
+!requirements.txt
+!README.md
+!LICENSE
