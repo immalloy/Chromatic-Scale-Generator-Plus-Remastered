@@ -3,7 +3,7 @@ setlocal ENABLEEXTENSIONS ENABLEDELAYEDEXPANSION
 
 REM ===============================================================
 REM  Chromatic Scale Generator PLUS! (REMASTERED) - Build Script
-REM  Entry: CSGPR.py
+REM  Entry: CSGPR.py (thin launcher for the csgpr package)
 REM  Output: dist\CSGPR\CSGPR.exe
 REM ===============================================================
 
@@ -15,6 +15,10 @@ set ICON=icon.ico
 
 if not exist "%APP%" (
   echo [ERROR] Cannot find %APP% in %cd%
+  exit /b 1
+)
+if not exist "csgpr" (
+  echo [ERROR] Cannot find application package folder: csgpr
   exit /b 1
 )
 if not exist "%ICON%" (
@@ -44,6 +48,8 @@ pyinstaller --noconfirm --clean --windowed --noupx ^
   --name CSGPR ^
   --collect-all numpy ^
   --collect-all parselmouth ^
+  --collect-all i18n_pkg ^
+  --collect-all csgpr ^
   --icon="%ICON%" "%APP%"
 
 if errorlevel 1 (
@@ -59,6 +65,6 @@ echo   dist\CSGPR\CSGPR.exe
 
 echo.
 echo [Optional] Build single-file EXE (may trigger more antivirus flags):
-echo   pyinstaller --noconfirm --clean --onefile --windowed --noupx --name CSGPR --collect-all numpy --collect-all parselmouth --icon="%ICON%" "%APP%"
+echo   pyinstaller --noconfirm --clean --onefile --windowed --noupx --name CSGPR --collect-all numpy --collect-all parselmouth --collect-all i18n_pkg --collect-all csgpr --icon="%ICON%" "%APP%"
 echo.
 pause
