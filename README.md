@@ -3,6 +3,9 @@
 ### The ALMOST-ultimate modern tool for **Friday Night Funkin’** musicians, modders, and sound designers
 
 *Remastered by Malloy — based on the original by ChillSpaceIRL and nullfrequency*
+
+---
+
 *Stuff is still being fixed btw :D*
 
 ![Version](https://img.shields.io/badge/version-2.3.0-pink?style=for-the-badge)
@@ -15,7 +18,7 @@
 
 ## 💾 Latest Release
 
-➡️ [**Download the Latest Build**](not yet)
+➡️ [**Download the Latest Build**](https://github.com/immalloy/Chromatic-Scale-Generator-Plus-Remastered/releases)
 Includes prebuilt EXE, sample presets, and language packs.
 
 ---
