@@ -1,5 +1,3 @@
-# chromatic_gen_qt_plus_modular_i18n.py
-# Main app imports i18n_pkg.* (separate files for each language + handler)
 from __future__ import annotations
 import os, sys, random, subprocess
 from pathlib import Path
@@ -36,7 +34,7 @@ APP_TITLE = "Chromatic Scale Generator PLUS! (REMASTERED)"
 APP_ICON_PATH = r"C:\Users\Administrator\Downloads\CSGR\icon.ico"  # optional
 DEFAULT_SR = 48000
 NOTE_NAMES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"]
-OCTAVES = [2,3,4,5,6,7]
+OCTAVES = list(range(1, 9))
 MAX_SEMITONES = 128
 MAX_GAP_SEC = 5.0
 DISCORD_INVITE = "https://discord.gg/pe6J4FbcCU"
