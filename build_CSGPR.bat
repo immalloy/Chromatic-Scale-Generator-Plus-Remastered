@@ -50,6 +50,7 @@ pyinstaller --noconfirm --clean --windowed --noupx ^
   --collect-all parselmouth ^
   --collect-all i18n_pkg ^
   --collect-all csgpr ^
+  --add-data "icon.ico;." ^
   --icon="%ICON%" "%APP%"
 
 if errorlevel 1 (
@@ -65,6 +66,6 @@ echo   dist\CSGPR\CSGPR.exe
 
 echo.
 echo [Optional] Build single-file EXE (may trigger more antivirus flags):
-echo   pyinstaller --noconfirm --clean --onefile --windowed --noupx --name CSGPR --collect-all numpy --collect-all parselmouth --collect-all i18n_pkg --collect-all csgpr --icon="%ICON%" "%APP%"
+echo   pyinstaller --noconfirm --clean --onefile --windowed --noupx --name CSGPR --collect-all numpy --collect-all parselmouth --collect-all i18n_pkg --collect-all csgpr --add-data "icon.ico;." --icon="%ICON%" "%APP%"
 echo.
 pause
