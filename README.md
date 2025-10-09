@@ -1,8 +1,9 @@
 # 🎵 Chromatic Scale Generator PLUS! (Remastered)
 
-### The ultimate modern tool for **Friday Night Funkin’** musicians, modders, and sound designers
+### The ALMOST-ultimate modern tool for **Friday Night Funkin’** musicians, modders, and sound designers
 
 *Remastered by Malloy — based on the original by ChillSpaceIRL and nullfrequency*
+*Stuff is still being fixed btw :D*
 
 ![Version](https://img.shields.io/badge/version-2.3.0-pink?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge\&logo=python)
