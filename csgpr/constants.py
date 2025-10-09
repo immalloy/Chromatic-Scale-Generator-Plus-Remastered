@@ -2,8 +2,25 @@ from __future__ import annotations
 
 """Shared constants for the Chromatic Scale Generator PLUS!"""
 
+from pathlib import Path
+import sys
+
+
+def _base_dir() -> Path:
+    """Return the directory where bundled resources live.
+
+    When frozen via PyInstaller the resources are extracted to ``_MEIPASS``.
+    Otherwise we fall back to the project root (two levels above this file).
+    """
+
+    root = getattr(sys, "_MEIPASS", None)  # type: ignore[attr-defined]
+    if root:
+        return Path(root)
+    return Path(__file__).resolve().parent.parent
+
+
 APP_TITLE = "Chromatic Scale Generator PLUS! (REMASTERED)"
-APP_ICON_PATH = r"C:\\Users\\Administrator\\Downloads\\CSGR\\icon.ico"  # optional
+APP_ICON_PATH = str(_base_dir() / "icon.ico")
 DEFAULT_SR = 48000
 NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
 OCTAVES = list(range(1, 9))
