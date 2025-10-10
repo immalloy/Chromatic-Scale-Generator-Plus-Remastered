@@ -21,6 +21,8 @@ STRINGS = {
     "Open Output Folder": "Open Output Folder",
     "Logs will appear here…": "Logs will appear here…",
     "Credits": "Credits",
+    "Wiki": "Wiki",
+    "Tutorial": "Tutorial",
     "&Help": "&Help",
 
     "Folder not found.": "Folder not found.",

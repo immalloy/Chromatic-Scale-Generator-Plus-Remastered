@@ -22,6 +22,8 @@ STRINGS = {
     "Open Output Folder": "打开输出文件夹",
     "Logs will appear here…": "日志显示在这里...",
     "Credits": "致谢",
+    "Wiki": "Wiki",
+    "Tutorial": "教程",
     "&Help": "&帮助",
     "Folder not found.": "未找到文件夹。",
     "Need at least 1.wav in this folder.": "此文件夹至少需要 1.wav。",

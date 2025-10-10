@@ -22,6 +22,8 @@ STRINGS = {
     "Open Output Folder": "출력 폴더 열기",
     "Logs will appear here…": "로그가 여기에 표시됩니다...",
     "Credits": "크레딧",
+    "Wiki": "위키",
+    "Tutorial": "튜토리얼",
     "&Help": "&도움말",
     "Folder not found.": "폴더를 찾을 수 없습니다.",
     "Need at least 1.wav in this folder.": "이 폴더에는 최소한 1.wav가 필요합니다.",

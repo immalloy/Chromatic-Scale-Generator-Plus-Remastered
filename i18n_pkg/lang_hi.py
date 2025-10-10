@@ -22,6 +22,8 @@ STRINGS = {
     "Open Output Folder": "आउटपुट फ़ोल्डर खोलें",
     "Logs will appear here…": "लॉग यहाँ दिखेंगे...",
     "Credits": "श्रेय",
+    "Wiki": "विकि",
+    "Tutorial": "ट्यूटोरियल",
     "&Help": "&मदद",
     "Folder not found.": "फ़ोल्डर नहीं मिला।",
     "Need at least 1.wav in this folder.": "इस फ़ोल्डर में कम से कम 1.wav चाहिए।",

@@ -6,8 +6,8 @@ import os
 import subprocess
 from pathlib import Path
 
-from PySide6.QtCore import Slot
-from PySide6.QtGui import QAction, QIcon
+from PySide6.QtCore import QUrl, Slot
+from PySide6.QtGui import QAction, QDesktopServices, QIcon
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -38,6 +38,8 @@ from .constants import (
     MAX_SEMITONES,
     NOTE_NAMES,
     OCTAVES,
+    PROJECT_TUTORIAL_URL,
+    PROJECT_WIKI_URL,
 )
 from .dialogs import CreditsDialog
 from .generation import GenerateWorker
@@ -197,10 +199,16 @@ class MainWindow(QMainWindow):
         footer_row = QHBoxLayout()
         self.footer = QLabel(T(self.lang, "Footer"))
         self.footer.setObjectName("Footer")
+        self.wiki_btn = QPushButton(T(self.lang, "Wiki"))
+        self.wiki_btn.setObjectName("LinkButton")
+        self.tutorial_btn = QPushButton(T(self.lang, "Tutorial"))
+        self.tutorial_btn.setObjectName("LinkButton")
         self.credits_btn = QPushButton(T(self.lang, "Credits"))
         self.credits_btn.setObjectName("LinkButton")
         footer_row.addWidget(self.footer, 1)
         footer_row.addStretch(1)
+        footer_row.addWidget(self.wiki_btn, 0)
+        footer_row.addWidget(self.tutorial_btn, 0)
         footer_row.addWidget(self.credits_btn, 0)
 
         outer = QVBoxLayout(central)
@@ -211,6 +219,16 @@ class MainWindow(QMainWindow):
         outer.addLayout(footer_row)
 
         help_menu = self.menuBar().addMenu(T(self.lang, "&Help"))
+        act_wiki = QAction(T(self.lang, "Wiki"), self)
+        act_wiki.triggered.connect(self.open_wiki)
+        help_menu.addAction(act_wiki)
+
+        act_tutorial = QAction(T(self.lang, "Tutorial"), self)
+        act_tutorial.triggered.connect(self.open_tutorial)
+        help_menu.addAction(act_tutorial)
+
+        help_menu.addSeparator()
+
         act_credits = QAction(T(self.lang, "Credits"), self)
         act_credits.triggered.connect(self.show_credits)
         help_menu.addAction(act_credits)
@@ -225,6 +243,8 @@ class MainWindow(QMainWindow):
         self.generate_btn.clicked.connect(self.start_generation)
         self.cancel_btn.clicked.connect(self.cancel_generation)
         self.open_out_btn.clicked.connect(self.open_output_folder_clicked)
+        self.wiki_btn.clicked.connect(self.open_wiki)
+        self.tutorial_btn.clicked.connect(self.open_tutorial)
         self.credits_btn.clicked.connect(self.show_credits)
 
         self.worker: GenerateWorker | None = None
@@ -265,11 +285,23 @@ class MainWindow(QMainWindow):
         self.generate_btn.setText(T(self.lang, "Generate Chromatic"))
         self.cancel_btn.setText(T(self.lang, "Cancel"))
         self.open_out_btn.setText(T(self.lang, "Open Output Folder"))
+        self.wiki_btn.setText(T(self.lang, "Wiki"))
+        self.tutorial_btn.setText(T(self.lang, "Tutorial"))
         self.credits_btn.setText(T(self.lang, "Credits"))
         self.footer.setText(T(self.lang, "Footer"))
 
         self.menuBar().clear()
         help_menu = self.menuBar().addMenu(T(self.lang, "&Help"))
+        act_wiki = QAction(T(self.lang, "Wiki"), self)
+        act_wiki.triggered.connect(self.open_wiki)
+        help_menu.addAction(act_wiki)
+
+        act_tutorial = QAction(T(self.lang, "Tutorial"), self)
+        act_tutorial.triggered.connect(self.open_tutorial)
+        help_menu.addAction(act_tutorial)
+
+        help_menu.addSeparator()
+
         act_credits = QAction(T(self.lang, "Credits"), self)
         act_credits.triggered.connect(self.show_credits)
         help_menu.addAction(act_credits)
@@ -371,6 +403,12 @@ class MainWindow(QMainWindow):
     def show_credits(self) -> None:
         dialog = CreditsDialog(self.lang, self)
         dialog.exec()
+
+    def open_wiki(self) -> None:
+        QDesktopServices.openUrl(QUrl(PROJECT_WIKI_URL))
+
+    def open_tutorial(self) -> None:
+        QDesktopServices.openUrl(QUrl(PROJECT_TUTORIAL_URL))
 
     @Slot()
     def start_generation(self) -> None:
