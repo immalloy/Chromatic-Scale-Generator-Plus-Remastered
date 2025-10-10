@@ -2,7 +2,7 @@ from __future__ import annotations
 
 """Standalone Qt dialogs used by the application."""
 
-from PySide6.QtCore import QUrl
+from PySide6.QtCore import QUrl, Qt
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
     QDialog,
@@ -25,6 +25,7 @@ class CreditsDialog(QDialog):
 
         self.setWindowTitle(T(self.lang, "Credits"))
         self.setMinimumWidth(420)
+        self.setAttribute(Qt.WA_StyledBackground, True)
 
         layout = QVBoxLayout(self)
         text = QLabel(T(self.lang, "CreditsText"))

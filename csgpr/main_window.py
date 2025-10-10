@@ -120,7 +120,8 @@ class MainWindow(QMainWindow):
         self.lang_combo.setCurrentIndex(self.lang_combo.findData("en"))
 
         row = 0
-        cfg_layout.addWidget(QLabel(T(self.lang, "Sample folder")), row, 0)
+        self.sample_folder_label = QLabel(T(self.lang, "Sample folder"))
+        cfg_layout.addWidget(self.sample_folder_label, row, 0)
         folder_row = QHBoxLayout()
         folder_row.addWidget(self.path_edit, 1)
         folder_row.addWidget(self.browse_btn, 0)
@@ -130,19 +131,23 @@ class MainWindow(QMainWindow):
         cfg_layout.addWidget(self.warn_label, row, 0, 1, 2)
         row += 1
 
-        cfg_layout.addWidget(QLabel(T(self.lang, "Starting note")), row, 0)
+        self.starting_note_label = QLabel(T(self.lang, "Starting note"))
+        cfg_layout.addWidget(self.starting_note_label, row, 0)
         cfg_layout.addWidget(self.note_combo, row, 1)
         row += 1
 
-        cfg_layout.addWidget(QLabel(T(self.lang, "Starting octave")), row, 0)
+        self.starting_octave_label = QLabel(T(self.lang, "Starting octave"))
+        cfg_layout.addWidget(self.starting_octave_label, row, 0)
         cfg_layout.addWidget(self.octave_combo, row, 1)
         row += 1
 
-        cfg_layout.addWidget(QLabel(T(self.lang, "Semitone range")), row, 0)
+        self.semitone_range_label = QLabel(T(self.lang, "Semitone range"))
+        cfg_layout.addWidget(self.semitone_range_label, row, 0)
         cfg_layout.addWidget(self.range_spin, row, 1)
         row += 1
 
-        cfg_layout.addWidget(QLabel(T(self.lang, "Gap (seconds)")), row, 0)
+        self.gap_label = QLabel(T(self.lang, "Gap (seconds)"))
+        cfg_layout.addWidget(self.gap_label, row, 0)
         cfg_layout.addWidget(self.gap_spin, row, 1)
         row += 1
 
@@ -159,13 +164,16 @@ class MainWindow(QMainWindow):
         row += 1
 
         appearance_row = QHBoxLayout()
-        appearance_row.addWidget(QLabel("Theme:"))
+        self.theme_label = QLabel(T(self.lang, "Theme:"))
+        appearance_row.addWidget(self.theme_label)
         appearance_row.addWidget(self.mode_combo)
         appearance_row.addSpacing(12)
-        appearance_row.addWidget(QLabel("Accent:"))
+        self.accent_label = QLabel(T(self.lang, "Accent:"))
+        appearance_row.addWidget(self.accent_label)
         appearance_row.addWidget(self.accent_combo)
         appearance_row.addSpacing(12)
-        appearance_row.addWidget(QLabel("Language:"))
+        self.language_label = QLabel(T(self.lang, "Language:"))
+        appearance_row.addWidget(self.language_label)
         appearance_row.addWidget(self.lang_combo)
         appearance_row.addStretch(1)
         cfg_layout.addLayout(appearance_row, row, 0, 1, 2)
@@ -272,6 +280,11 @@ class MainWindow(QMainWindow):
         self.setWindowTitle(APP_TITLE)
         self.cfg_group.setTitle(T(self.lang, "Configuration"))
         self.run_group.setTitle(T(self.lang, "Run"))
+        self.sample_folder_label.setText(T(self.lang, "Sample folder"))
+        self.starting_note_label.setText(T(self.lang, "Starting note"))
+        self.starting_octave_label.setText(T(self.lang, "Starting octave"))
+        self.semitone_range_label.setText(T(self.lang, "Semitone range"))
+        self.gap_label.setText(T(self.lang, "Gap (seconds)"))
         self.browse_btn.setText(T(self.lang, "Browse…"))
         self.path_edit.setPlaceholderText(
             T(self.lang, "Select a folder containing 1.wav, 2.wav, ...")
@@ -285,6 +298,9 @@ class MainWindow(QMainWindow):
         self.generate_btn.setText(T(self.lang, "Generate Chromatic"))
         self.cancel_btn.setText(T(self.lang, "Cancel"))
         self.open_out_btn.setText(T(self.lang, "Open Output Folder"))
+        self.theme_label.setText(T(self.lang, "Theme:"))
+        self.accent_label.setText(T(self.lang, "Accent:"))
+        self.language_label.setText(T(self.lang, "Language:"))
         self.wiki_btn.setText(T(self.lang, "Wiki"))
         self.tutorial_btn.setText(T(self.lang, "Tutorial"))
         self.credits_btn.setText(T(self.lang, "Credits"))
