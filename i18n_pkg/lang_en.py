@@ -40,9 +40,9 @@ STRINGS = {
     "An error occurred.": "An error occurred.",
     "⚠️ Generation was cancelled.": "⚠️ Generation was cancelled.",
 
-    "Footer": "Original tool by @ChillSpaceIRL • Remastered by @nullfreq_ and Malloy  |  Version 2.3.0 • October 2025",
+    "Footer": "Original tool by @ChillSpaceIRL • Remastered by @nullfreq_ and Malloy  |  Version {version} • {month_name} {year}",
     "Join Discord": "Join Discord",
-    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\n\nOriginal tool by @ChillSpaceIRL\nRemastered by @nullfreq_ and Malloy\nVersion 2.3.0 • October 2025\n\nThanks for using the app!",
+    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\n\nOriginal tool by @ChillSpaceIRL\nRemastered by @nullfreq_ and Malloy\nVersion {version} • {month_name} {year}\n\nThanks for using the app!",
 
     "Found {n} sample(s) (1.wav..{m}.wav).": "Found {n} sample(s) (1.wav..{m}.wav).",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}",
