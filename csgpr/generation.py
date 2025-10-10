@@ -152,9 +152,6 @@ class GenerateWorker(QThread):
                     self._emit("  • " + T(self.lang, "normalized"))
 
                 if self.pitched:
-                    snapshot = None
-                    if target_frequency < 60.0:
-                        snapshot = snd.values.copy()
                     manipulation = parselmouth.praat.call(
                         snd,
                         "To Manipulation",
@@ -165,11 +162,53 @@ class GenerateWorker(QThread):
                     pitch_tier = parselmouth.praat.call(
                         manipulation, "Extract pitch tier"
                     )
-                    parselmouth.praat.call(
-                        pitch_tier,
-                        "Formula",
-                        f"{target_frequency}",
+                    start_time = float(snd.xmin)
+                    end_time = float(snd.xmax)
+                    if end_time <= start_time:
+                        end_time = start_time + (1.0 / DEFAULT_SR)
+
+                    num_points = int(
+                        parselmouth.praat.call(pitch_tier, "Get number of points")
                     )
+
+                    if num_points == 0:
+                        pitch_tier = parselmouth.praat.call(
+                            "Create PitchTier",
+                            "TargetPitchTier",
+                            start_time,
+                            end_time,
+                        )
+                        parselmouth.praat.call(
+                            pitch_tier, "Add point...", start_time, target_frequency
+                        )
+                        parselmouth.praat.call(
+                            pitch_tier, "Add point...", end_time, target_frequency
+                        )
+                    else:
+                        def ensure_point(point_time: float) -> None:
+                            index = parselmouth.praat.call(
+                                pitch_tier, "Get low index from time", point_time
+                            )
+                            if index != 0:
+                                existing_time = float(
+                                    parselmouth.praat.call(
+                                        pitch_tier, "Get time of point", index
+                                    )
+                                )
+                                if math.isclose(existing_time, point_time, abs_tol=1e-6):
+                                    return
+                            parselmouth.praat.call(
+                                pitch_tier, "Add point...", point_time, target_frequency
+                            )
+
+                        ensure_point(start_time)
+                        ensure_point(end_time)
+
+                        parselmouth.praat.call(
+                            pitch_tier,
+                            "Formula",
+                            f"{target_frequency}",
+                        )
                     parselmouth.praat.call(
                         [pitch_tier, manipulation], "Replace pitch tier"
                     )
