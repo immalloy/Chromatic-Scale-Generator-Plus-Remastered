@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 
 from PySide6.QtCore import QUrl, Slot
-from PySide6.QtGui import QAction, QDesktopServices, QIcon
+from PySide6.QtGui import QAction, QDesktopServices, QIcon, QTextCursor
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -502,7 +502,7 @@ class MainWindow(QMainWindow):
     @Slot(str)
     def append_log(self, text: str) -> None:
         self.log.append(text)
-        self.log.moveCursor(self.log.textCursor().End)
+        self.log.moveCursor(QTextCursor.End)
 
     @Slot()
     def on_worker_finished(self) -> None:
