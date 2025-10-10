@@ -1,5 +1,9 @@
 # i18n_pkg/lang_es.py
+from .meta import BASE_STRINGS
+
+
 STRINGS = {
+    **BASE_STRINGS,
     "Configuration": "Configuración",
     "Sample folder": "Carpeta con muestras",
     "Select a folder containing 1.wav, 2.wav, ...": "Seleccione una carpeta con 1.wav, 2.wav, ...",
@@ -12,6 +16,7 @@ STRINGS = {
     "Dump individual pitched samples": "Guardar muestras con tono por separado",
     "Randomize sample selection": "Elegir muestras al azar",
     "Peak normalize each sample (pre-pitch)": "Normalizar pico en cada muestra (antes del tono)",
+    "Embed FL Studio Slicex slice markers": "Incrustar marcadores de corte de FL Studio Slicex",
     "Theme:": "Tema:",
     "Accent:": "Color:",
     "Language:": "Idioma:",
@@ -43,12 +48,14 @@ STRINGS = {
     "Footer": "Herramienta original de @ChillSpaceIRL • Remasterizado por @nullfreq_ y Malloy  |  Versión {version} • {month_name} {year}",
     "Join Discord": "Unirse a Discord",
     "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\n\nHerramienta original: @ChillSpaceIRL\nRemasterizado por: @nullfreq_ y Malloy\nVersión {version} • {month_name} {year}\n\n¡Gracias por usar la app!",
+
     "Found {n} sample(s) (1.wav..{m}.wav).": "Se encontraron {n} muestras (1.wav..{m}.wav).",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "Semitonos: {s} | Pausa: {g:.3f}s | Con tono: {p}",
     "Peak normalization: ON": "Normalización de pico: ACTIVADA",
     "[{a}/{b}] Loading {name}": "[{a}/{b}] Cargando {name}",
     "normalized": "normalizado",
     "Concatenating chromatic scale...": "Uniendo la escala cromática...",
+    "Embedding FL Studio Slicex slice markers...": "Incrustando marcadores de corte de FL Studio Slicex...",
     "Saved: {path}": "Guardado: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "Guardadas {n} muestras con tono en: {dir}",
 }
