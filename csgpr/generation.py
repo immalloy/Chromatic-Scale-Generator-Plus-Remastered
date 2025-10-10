@@ -140,6 +140,7 @@ class GenerateWorker(QThread):
                 snd = parselmouth.Sound(str(file_path))
                 snd = parselmouth.praat.call(snd, "Resample", DEFAULT_SR, 1)
                 snd = parselmouth.praat.call(snd, "Convert to mono")
+                target_frequency = self._note_frequency(i)
 
                 if self.normalize:
                     arr = snd.values.copy()
@@ -150,8 +151,15 @@ class GenerateWorker(QThread):
                     self._emit("  • " + T(self.lang, "normalized"))
 
                 if self.pitched:
+                    snapshot = None
+                    if target_frequency < 60.0:
+                        snapshot = snd.values.copy()
                     manipulation = parselmouth.praat.call(
-                        snd, "To Manipulation", 0.05, 60, 600
+                        snd,
+                        "To Manipulation",
+                        0.05,
+                        20.0 if target_frequency < 60.0 else 60.0,
+                        600,
                     )
                     pitch_tier = parselmouth.praat.call(
                         manipulation, "Extract pitch tier"
@@ -159,7 +167,7 @@ class GenerateWorker(QThread):
                     parselmouth.praat.call(
                         pitch_tier,
                         "Formula",
-                        f"32.703 * (2 ^ ({i + starting_key + 12}/12))",
+                        f"{target_frequency}",
                     )
                     parselmouth.praat.call(
                         [pitch_tier, manipulation], "Replace pitch tier"
