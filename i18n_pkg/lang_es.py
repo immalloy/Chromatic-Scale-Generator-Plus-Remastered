@@ -40,9 +40,9 @@ STRINGS = {
     "An error occurred.": "Ocurrió un error.",
     "⚠️ Generation was cancelled.": "⚠️ Se canceló la generación.",
 
-    "Footer": "Herramienta original de @ChillSpaceIRL • Remasterizado por @nullfreq_ y Malloy  |  Versión 2.3.0 • Octubre 2025",
+    "Footer": "Herramienta original de @ChillSpaceIRL • Remasterizado por @nullfreq_ y Malloy  |  Versión {version} • {month_name} {year}",
     "Join Discord": "Unirse a Discord",
-    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\n\nHerramienta original: @ChillSpaceIRL\nRemasterizado por: @nullfreq_ y Malloy\nVersión 2.3.0 • Octubre 2025\n\n¡Gracias por usar la app!",
+    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\n\nHerramienta original: @ChillSpaceIRL\nRemasterizado por: @nullfreq_ y Malloy\nVersión {version} • {month_name} {year}\n\n¡Gracias por usar la app!",
     "Found {n} sample(s) (1.wav..{m}.wav).": "Se encontraron {n} muestras (1.wav..{m}.wav).",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "Semitonos: {s} | Pausa: {g:.3f}s | Con tono: {p}",
     "Peak normalization: ON": "Normalización de pico: ACTIVADA",

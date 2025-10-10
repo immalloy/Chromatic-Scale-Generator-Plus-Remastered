@@ -1,6 +1,8 @@
 # i18n_pkg/lang_core.py
 from __future__ import annotations
-from typing import Dict, Callable
+from typing import Dict
+
+from .meta import APP_VERSION, RELEASE_MONTH, RELEASE_YEAR, get_month_name
 
 # Import language dictionaries (each in its own file)
 from .lang_en import STRINGS as en
@@ -50,11 +52,22 @@ def list_languages():
 def get_lang(code: str) -> Dict[str, str]:
     return LANGS.get(code, en)
 
+def _base_context(lang: str) -> Dict[str, str]:
+    return {
+        "version": APP_VERSION,
+        "year": str(RELEASE_YEAR),
+        "month_number": str(RELEASE_MONTH),
+        "month_name": get_month_name(lang),
+    }
+
+
 def T(lang: str, key: str, **kwargs) -> str:
     # Fallback to English if missing
     table = get_lang(lang)
     s = table.get(key, en.get(key, key))
     try:
-        return s.format(**kwargs)
+        ctx = _base_context(lang)
+        ctx.update(kwargs)
+        return s.format(**ctx)
     except Exception:
         return s
