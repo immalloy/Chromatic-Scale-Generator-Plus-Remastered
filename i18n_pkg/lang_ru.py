@@ -22,6 +22,8 @@ STRINGS = {
     "Open Output Folder": "Открыть папку вывода",
     "Logs will appear here…": "Логи будут здесь...",
     "Credits": "Благодарности",
+    "Wiki": "Вики",
+    "Tutorial": "Учебник",
     "&Help": "&Справка",
     "Folder not found.": "Папка не найдена.",
     "Need at least 1.wav in this folder.": "В папке нужен хотя бы 1.wav.",

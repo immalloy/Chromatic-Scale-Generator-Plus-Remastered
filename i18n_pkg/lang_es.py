@@ -21,6 +21,8 @@ STRINGS = {
     "Open Output Folder": "Abrir carpeta de salida",
     "Logs will appear here…": "Los mensajes aparecerán aquí…",
     "Credits": "Créditos",
+    "Wiki": "Wiki",
+    "Tutorial": "Tutorial",
     "&Help": "&Ayuda",
 
     "Folder not found.": "Carpeta no encontrada.",

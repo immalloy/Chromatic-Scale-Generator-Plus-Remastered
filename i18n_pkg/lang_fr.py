@@ -22,6 +22,8 @@ STRINGS = {
     "Open Output Folder": "Ouvrir le dossier de sortie",
     "Logs will appear here…": "Les journaux s'affichent ici...",
     "Credits": "Credits",
+    "Wiki": "Wiki",
+    "Tutorial": "Tutoriel",
     "&Help": "&Aide",
     "Folder not found.": "Dossier introuvable.",
     "Need at least 1.wav in this folder.": "Il faut au moins 1.wav dans ce dossier.",

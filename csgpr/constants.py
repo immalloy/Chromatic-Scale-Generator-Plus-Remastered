@@ -27,3 +27,9 @@ OCTAVES = list(range(1, 9))
 MAX_SEMITONES = 128
 MAX_GAP_SEC = 5.0
 DISCORD_INVITE = "https://discord.gg/pe6J4FbcCU"
+PROJECT_WIKI_URL = (
+    "https://github.com/immalloy/Chromatic-Scale-Generator-Plus-Remastered/wiki"
+)
+PROJECT_TUTORIAL_URL = (
+    "https://github.com/immalloy/Chromatic-Scale-Generator-Plus-Remastered/wiki/Tutorial"
+)

@@ -22,6 +22,8 @@ STRINGS = {
     "Open Output Folder": "出力フォルダを開く",
     "Logs will appear here…": "ログはここに表示されます...",
     "Credits": "クレジット",
+    "Wiki": "Wiki",
+    "Tutorial": "チュートリアル",
     "&Help": "&ヘルプ",
     "Folder not found.": "フォルダが見つかりません。",
     "Need at least 1.wav in this folder.": "このフォルダに 1.wav が必要です。",
