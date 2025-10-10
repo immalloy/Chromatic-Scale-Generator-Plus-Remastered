@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 # i18n_pkg/lang_fr.py (fixed)
+from .meta import BASE_STRINGS
+
+
 STRINGS = {
+    **BASE_STRINGS,
     "Configuration": "Parametres",
     "Sample folder": "Dossier d'echantillons",
     "Select a folder containing 1.wav, 2.wav, ...": "Choisissez un dossier avec 1.wav, 2.wav, ...",
@@ -13,6 +17,7 @@ STRINGS = {
     "Dump individual pitched samples": "Enregistrer chaque echantillon transforme",
     "Randomize sample selection": "Choisir des echantillons au hasard",
     "Peak normalize each sample (pre-pitch)": "Normaliser au pic (avant le changement)",
+    "Embed FL Studio Slicex slice markers": "Intégrer les marqueurs de découpe FL Studio Slicex",
     "Theme:": "Theme:",
     "Accent:": "Couleur:",
     "Language:": "Langue:",
@@ -25,6 +30,7 @@ STRINGS = {
     "Wiki": "Wiki",
     "Tutorial": "Tutoriel",
     "&Help": "&Aide",
+
     "Folder not found.": "Dossier introuvable.",
     "Need at least 1.wav in this folder.": "Il faut au moins 1.wav dans ce dossier.",
     "No sequential samples found (1.wav, 2.wav, ...).": "Aucun fichier 1.wav, 2.wav, ... trouve.",
@@ -32,22 +38,25 @@ STRINGS = {
     "Selected folder: {p}": "Dossier selectionne: {p}",
     "No output file yet.": "Pas encore de fichier de sortie.",
     "Invalid folder. Place '1.wav', '2.wav', ... in it.": "Dossier invalide. Ajoutez '1.wav', '2.wav', ...",
-    "'{name}' already exists. Overwrite?": "' {name}' existe deja. Ecraser?",
+    "'{name}' already exists. Overwrite?": "'{name}' existe deja. Ecraser?",
     "Cancelled by user.": "Annule par l'utilisateur.",
     "Generating…": "Generation…",
     "Cancelling…": "Annulation…",
     "Done! Saved to {p}": "Termine! Enregistre dans {p}",
     "An error occurred.": "Une erreur s'est produite.",
     "⚠️ Generation was cancelled.": "⚠️ La generation a ete annulee.",
+
     "Footer": "Outil original: @ChillSpaceIRL - Remasterise: @nullfreq_ et Malloy  |  Version {version} - {month_name} {year}",
     "Join Discord": "Rejoindre Discord",
-    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\\n\\nOutil original: @ChillSpaceIRL\\nRemasterise par: @nullfreq_ et Malloy\\nVersion {version} - {month_name} {year}\\n\\nMerci d'utiliser l'app!",
+    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\n\nOutil original: @ChillSpaceIRL\nRemasterise par: @nullfreq_ et Malloy\nVersion {version} - {month_name} {year}\n\nMerci d'utiliser l'app!",
+
     "Found {n} sample(s) (1.wav..{m}.wav).": "{n} echantillon(s) trouve(s) (1.wav..{m}.wav).",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "Demi-tons: {s} | Pause: {g:.3f}s | Transforme: {p}",
     "Peak normalization: ON": "Normalisation au pic: ACTIVEE",
     "[{a}/{b}] Loading {name}": "[{a}/{b}] Chargement de {name}",
     "normalized": "normalise",
     "Concatenating chromatic scale...": "Concatenation de la chromatique...",
+    "Embedding FL Studio Slicex slice markers...": "Intégration des marqueurs de découpe FL Studio Slicex...",
     "Saved: {path}": "Enregistre: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "{n} echantillon(s) transforme(s) enregistre(s) dans: {dir}",
 }
