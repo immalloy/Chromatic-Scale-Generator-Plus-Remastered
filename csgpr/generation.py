@@ -2,6 +2,7 @@ from __future__ import annotations
 
 """Background worker that generates chromatic scales."""
 
+import math
 import random
 import struct
 from dataclasses import dataclass
@@ -234,6 +235,19 @@ class GenerateWorker(QThread):
         name = NOTE_NAMES[total % len(NOTE_NAMES)]
         octave = self.start_octave + (total // len(NOTE_NAMES))
         return f"{name}{octave}"
+
+    def _note_frequency(self, index: int) -> float:
+        """Return the equal temperament frequency for the note at ``index``.
+
+        Notes are calculated relative to ``A4`` (MIDI note 69) at 440 Hz. The
+        ``start_note_index`` and ``start_octave`` determine the MIDI note number
+        for the first generated note, and ``index`` acts as the semitone offset
+        from that starting point.
+        """
+
+        base_midi = (self.start_octave + 1) * 12 + self.start_note_index
+        midi_note = base_midi + index
+        return 440.0 * math.pow(2.0, (midi_note - 69) / 12.0)
 
 
 __all__ = ["GenerateWorker"]
