@@ -152,52 +152,7 @@ class GenerateWorker(QThread):
                     self._emit("  • " + T(self.lang, "normalized"))
 
                 if self.pitched:
-                    duration = float(snd.get_total_duration())
-                    manipulation = parselmouth.praat.call(
-                        snd,
-                        "To Manipulation",
-                        0.05,
-                        20.0 if target_frequency < 60.0 else 60.0,
-                        600,
-                    )
-                    pitch_tier = parselmouth.praat.call(
-                        manipulation, "Extract pitch tier"
-                    )
-                    parselmouth.praat.call(
-                        pitch_tier,
-                        "Remove points between",
-                        snd.xmin,
-                        snd.xmax,
-                    )
-                    start_time = float(snd.xmin)
-                    end_time = float(snd.xmax)
-                    parselmouth.praat.call(
-                        pitch_tier,
-                        "Add point",
-                        start_time,
-                        target_frequency,
-                    )
-                    if duration > 0.0 and end_time > start_time:
-                        parselmouth.praat.call(
-                            pitch_tier,
-                            "Add point",
-                            end_time,
-                            target_frequency,
-                        )
-                    else:
-                        parselmouth.praat.call(
-                            pitch_tier,
-                            "Add point",
-                            start_time + 1e-6,
-                            target_frequency,
-                        )
-                    parselmouth.praat.call(
-                        [pitch_tier, manipulation], "Replace pitch tier"
-                    )
-                    resynth = parselmouth.praat.call(
-                        manipulation, "Get resynthesis (overlap-add)"
-                    )
-                    current_sound = resynth
+                    current_sound = _retune_sound(snd, target_frequency)
                 else:
                     current_sound = snd
 
@@ -269,6 +224,118 @@ class GenerateWorker(QThread):
         base_midi = (self.start_octave + 1) * 12 + self.start_note_index
         midi_note = base_midi + index
         return 440.0 * math.pow(2.0, (midi_note - 69) / 12.0)
+
+
+def _retune_sound(sound: parselmouth.Sound, target_frequency: float) -> parselmouth.Sound:
+    """Return ``sound`` retuned to ``target_frequency``.
+
+    For frequencies below ~60 Hz the standard Praat manipulation approach tends
+    to leave the waveform untouched, which is what caused the extremely low
+    notes (``C1`` through ``G1``) to remain off pitch. To compensate we try a
+    lightweight FFT-based retuning strategy for those frequencies before
+    falling back to the traditional manipulation pipeline. If anything fails we
+    simply return the original sound as a safe fallback.
+    """
+
+    if target_frequency < 60.0:
+        retuned = _retune_with_fft(sound, target_frequency)
+        if retuned is not None:
+            return retuned
+
+    return _retune_with_manipulation(sound, target_frequency)
+
+
+def _retune_with_manipulation(
+    sound: parselmouth.Sound, target_frequency: float
+) -> parselmouth.Sound:
+    duration = float(sound.get_total_duration())
+    manipulation = parselmouth.praat.call(
+        sound,
+        "To Manipulation",
+        0.05,
+        20.0 if target_frequency < 60.0 else 60.0,
+        600,
+    )
+    pitch_tier = parselmouth.praat.call(manipulation, "Extract pitch tier")
+    parselmouth.praat.call(
+        pitch_tier,
+        "Remove points between",
+        sound.xmin,
+        sound.xmax,
+    )
+    start_time = float(sound.xmin)
+    end_time = float(sound.xmax)
+    parselmouth.praat.call(
+        pitch_tier,
+        "Add point",
+        start_time,
+        target_frequency,
+    )
+    if duration > 0.0 and end_time > start_time:
+        parselmouth.praat.call(
+            pitch_tier,
+            "Add point",
+            end_time,
+            target_frequency,
+        )
+    else:
+        parselmouth.praat.call(
+            pitch_tier,
+            "Add point",
+            start_time + 1e-6,
+            target_frequency,
+        )
+    parselmouth.praat.call([pitch_tier, manipulation], "Replace pitch tier")
+    resynth = parselmouth.praat.call(
+        manipulation, "Get resynthesis (overlap-add)"
+    )
+    return resynth
+
+
+def _retune_with_fft(
+    sound: parselmouth.Sound, target_frequency: float
+) -> parselmouth.Sound | None:
+    try:
+        pitch = parselmouth.praat.call(sound, "To Pitch", 0.0, 5.0, 200.0)
+        current = float(
+            parselmouth.praat.call(pitch, "Get quantile", 0, 0, 0.5, "Hertz")
+        )
+    except Exception:
+        return None
+
+    if not current or math.isnan(current):
+        return None
+
+    ratio = float(target_frequency) / float(current)
+    if not math.isfinite(ratio) or ratio <= 0:
+        return None
+
+    if abs(math.log2(ratio)) < 1e-4:
+        return sound
+
+    values = np.asarray(sound.values, dtype=np.float64)
+    sr = int(sound.sampling_frequency)
+    n_channels, frames = values.shape
+    oversample = 8
+    padded_length = frames * oversample
+    freqs = np.fft.rfftfreq(padded_length, d=1.0 / sr)
+    shifted_channels = []
+
+    for channel in values:
+        padded = np.pad(channel, (0, padded_length - frames))
+        spectrum = np.fft.rfft(padded)
+        magnitude = np.abs(spectrum)
+        phase = np.angle(spectrum)
+        scaled = freqs / ratio
+        mag_shifted = np.interp(scaled, freqs, magnitude, left=0.0, right=0.0)
+        phase_shifted = np.interp(scaled, freqs, phase, left=0.0, right=0.0)
+        shifted_spec = mag_shifted * np.exp(1j * phase_shifted)
+        shifted = np.fft.irfft(shifted_spec, padded_length)
+        shifted_channels.append(shifted[:frames])
+
+    shifted_array = np.vstack(shifted_channels)
+    shifted_array = np.clip(shifted_array, -1.0, 1.0)
+    return parselmouth.Sound(shifted_array, sampling_frequency=sr)
 
 
 __all__ = ["GenerateWorker"]
