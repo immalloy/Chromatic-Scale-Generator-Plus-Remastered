@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 # i18n_pkg/lang_zh.py (fixed)
+from .meta import BASE_STRINGS
+
+
 STRINGS = {
+    **BASE_STRINGS,
     "Configuration": "设置",
     "Sample folder": "样本文件夹",
     "Select a folder containing 1.wav, 2.wav, ...": "选择包含 1.wav、2.wav ... 的文件夹",
@@ -13,7 +17,7 @@ STRINGS = {
     "Dump individual pitched samples": "保存每个变调样本",
     "Randomize sample selection": "随机选择样本",
     "Peak normalize each sample (pre-pitch)": "对每个样本峰值归一化(变调前)",
-    "Embed FL Studio Slicex slice markers": "Embed FL Studio Slicex slice markers",
+    "Embed FL Studio Slicex slice markers": "嵌入 FL Studio Slicex 切片标记",
     "Theme:": "主题:",
     "Accent:": "颜色:",
     "Language:": "语言:",
@@ -26,6 +30,7 @@ STRINGS = {
     "Wiki": "Wiki",
     "Tutorial": "教程",
     "&Help": "&帮助",
+
     "Folder not found.": "未找到文件夹。",
     "Need at least 1.wav in this folder.": "此文件夹至少需要 1.wav。",
     "No sequential samples found (1.wav, 2.wav, ...).": "未找到连续样本(1.wav、2.wav ...)。",
@@ -40,16 +45,18 @@ STRINGS = {
     "Done! Saved to {p}": "完成! 已保存到 {p}",
     "An error occurred.": "发生错误。",
     "⚠️ Generation was cancelled.": "⚠️ 生成已取消。",
+
     "Footer": "原作者: @ChillSpaceIRL - 重制: @nullfreq_ 与 Malloy  |  版本 {version} - {year}年{month_number}月",
     "Join Discord": "加入 Discord",
-    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\\n\\n原作者: @ChillSpaceIRL\\n重制: @nullfreq_ 与 Malloy\\n版本 {version} - {year}年{month_number}月\\n\\n感谢使用!",
+    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\n\n原作者: @ChillSpaceIRL\n重制: @nullfreq_ 与 Malloy\n版本 {version} - {year}年{month_number}月\n\n感谢使用!",
+
     "Found {n} sample(s) (1.wav..{m}.wav).": "找到 {n} 个样本(1.wav..{m}.wav)。",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "半音数: {s} | 间隔: {g:.3f}秒 | 变调: {p}",
     "Peak normalization: ON": "峰值归一化: 开启",
     "[{a}/{b}] Loading {name}": "[{a}/{b}] 正在加载 {name}",
     "normalized": "已归一化",
     "Concatenating chromatic scale...": "正在拼接半音阶...",
-    "Embedding FL Studio Slicex slice markers...": "Embedding FL Studio Slicex slice markers...",
+    "Embedding FL Studio Slicex slice markers...": "正在嵌入 FL Studio Slicex 切片标记...",
     "Saved: {path}": "已保存: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "已保存 {n} 个变调样本到: {dir}",
 }

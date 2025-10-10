@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 # i18n_pkg/lang_bn.py (fixed)
+from .meta import BASE_STRINGS
+
+
 STRINGS = {
+    **BASE_STRINGS,
     "Configuration": "সেটিংস",
     "Sample folder": "স্যাম্পল ফোল্ডার",
     "Select a folder containing 1.wav, 2.wav, ...": "১.wav, ২.wav, ... থাকা ফোল্ডারটি বেছে নিন",
@@ -13,7 +17,7 @@ STRINGS = {
     "Dump individual pitched samples": "প্রতিটি পরিবর্তিত স্যাম্পল সংরক্ষণ করুন",
     "Randomize sample selection": "স্যাম্পল এলোমেলো নির্বাচন",
     "Peak normalize each sample (pre-pitch)": "প্রতি স্যাম্পল পিক নরমালাইজ (পিচের আগে)",
-    "Embed FL Studio Slicex slice markers": "Embed FL Studio Slicex slice markers",
+    "Embed FL Studio Slicex slice markers": "FL Studio Slicex স্লাইস মার্কার এম্বেড করুন",
     "Theme:": "থিম:",
     "Accent:": "রঙ:",
     "Language:": "ভাষা:",
@@ -26,6 +30,7 @@ STRINGS = {
     "Wiki": "উইকি",
     "Tutorial": "টিউটোরিয়াল",
     "&Help": "&হেল্প",
+
     "Folder not found.": "ফোল্ডার পাওয়া যায়নি।",
     "Need at least 1.wav in this folder.": "এই ফোল্ডারে অন্তত 1.wav দরকার।",
     "No sequential samples found (1.wav, 2.wav, ...).": "ক্রমিক স্যাম্পল নেই (1.wav, 2.wav, ...)।",
@@ -40,16 +45,18 @@ STRINGS = {
     "Done! Saved to {p}": "সম্পন্ন! {p} তে সংরক্ষণ করা হয়েছে",
     "An error occurred.": "একটি ত্রুটি হয়েছে।",
     "⚠️ Generation was cancelled.": "⚠️ তৈরি বাতিল হয়েছে।",
+
     "Footer": "মূল টুল: @ChillSpaceIRL - রিমাস্টার: @nullfreq_ এবং Malloy  |  সংস্করণ {version} - {month_name} {year}",
     "Join Discord": "ডিসকোর্ডে যোগ দিন",
-    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\\n\\nমূল টুল: @ChillSpaceIRL\\nরিমাস্টার: @nullfreq_ এবং Malloy\\nসংস্করণ {version} - {month_name} {year}\\n\\nধন্যবাদ!",
+    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\n\nমূল টুল: @ChillSpaceIRL\nরিমাস্টার: @nullfreq_ এবং Malloy\nসংস্করণ {version} - {month_name} {year}\n\nধন্যবাদ!",
+
     "Found {n} sample(s) (1.wav..{m}.wav).": "{n} টি স্যাম্পল পাওয়া গেছে (1.wav..{m}.wav)।",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "সেমিটোন: {s} | গ্যাপ: {g:.3f}সে | পিচড: {p}",
     "Peak normalization: ON": "পিক নরমালাইজ: চালু",
     "[{a}/{b}] Loading {name}": "[{a}/{b}] {name} লোড হচ্ছে",
     "normalized": "নরমালাইজ করা হয়েছে",
     "Concatenating chromatic scale...": "স্কেল জোড়া লাগানো হচ্ছে...",
-    "Embedding FL Studio Slicex slice markers...": "Embedding FL Studio Slicex slice markers...",
+    "Embedding FL Studio Slicex slice markers...": "FL Studio Slicex স্লাইস মার্কার এম্বেড করা হচ্ছে...",
     "Saved: {path}": "সংরক্ষিত: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "{n} টি পিচড স্যাম্পল রাখা হয়েছে: {dir}",
 }

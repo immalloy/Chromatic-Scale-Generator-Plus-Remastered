@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 # i18n_pkg/lang_ru.py (fixed)
+from .meta import BASE_STRINGS
+
+
 STRINGS = {
+    **BASE_STRINGS,
     "Configuration": "Настройки",
     "Sample folder": "Папка с сэмплами",
     "Select a folder containing 1.wav, 2.wav, ...": "Выберите папку с 1.wav, 2.wav, ...",
@@ -13,7 +17,7 @@ STRINGS = {
     "Dump individual pitched samples": "Сохранять отдельные семплы с тоном",
     "Randomize sample selection": "Случайный выбор семплов",
     "Peak normalize each sample (pre-pitch)": "Нормализация по пику (до изменения тона)",
-    "Embed FL Studio Slicex slice markers": "Embed FL Studio Slicex slice markers",
+    "Embed FL Studio Slicex slice markers": "Встраивать метки срезов FL Studio Slicex",
     "Theme:": "Тема:",
     "Accent:": "Цвет:",
     "Language:": "Язык:",
@@ -26,6 +30,7 @@ STRINGS = {
     "Wiki": "Вики",
     "Tutorial": "Учебник",
     "&Help": "&Справка",
+
     "Folder not found.": "Папка не найдена.",
     "Need at least 1.wav in this folder.": "В папке нужен хотя бы 1.wav.",
     "No sequential samples found (1.wav, 2.wav, ...).": "Нет последовательных файлов (1.wav, 2.wav, ...).",
@@ -40,16 +45,18 @@ STRINGS = {
     "Done! Saved to {p}": "Готово! Сохранено в {p}",
     "An error occurred.": "Произошла ошибка.",
     "⚠️ Generation was cancelled.": "⚠️ Создание отменено.",
+
     "Footer": "Оригинал: @ChillSpaceIRL - Ремастер: @nullfreq_ и Malloy  |  Версия {version} - {month_name} {year}",
     "Join Discord": "Вступить в Discord",
-    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\\n\\nОригинал: @ChillSpaceIRL\\nРемастер: @nullfreq_ и Malloy\\nВерсия {version} - {month_name} {year}\\n\\nСпасибо за использование!",
+    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\n\nОригинал: @ChillSpaceIRL\nРемастер: @nullfreq_ и Malloy\nВерсия {version} - {month_name} {year}\n\nСпасибо за использование!",
+
     "Found {n} sample(s) (1.wav..{m}.wav).": "Найдено {n} сэмплов (1.wav..{m}.wav).",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "Полутонов: {s} | Пауза: {g:.3f}с | Изменение тона: {p}",
     "Peak normalization: ON": "Нормализация по пику: ВКЛ",
     "[{a}/{b}] Loading {name}": "[{a}/{b}] Загрузка {name}",
     "normalized": "нормализовано",
     "Concatenating chromatic scale...": "Склеивание хроматики...",
-    "Embedding FL Studio Slicex slice markers...": "Embedding FL Studio Slicex slice markers...",
+    "Embedding FL Studio Slicex slice markers...": "Встраивание меток срезов FL Studio Slicex...",
     "Saved: {path}": "Сохранено: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "Сохранено {n} семпл(ов) с тоном в: {dir}",
 }

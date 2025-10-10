@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 # i18n_pkg/lang_hi.py (fixed)
+from .meta import BASE_STRINGS
+
+
 STRINGS = {
+    **BASE_STRINGS,
     "Configuration": "सेटिंग",
     "Sample folder": "सैंपल फ़ोल्डर",
     "Select a folder containing 1.wav, 2.wav, ...": "ऐसा फ़ोल्डर चुनें जिसमें 1.wav, 2.wav, ... हों",
@@ -13,7 +17,7 @@ STRINGS = {
     "Dump individual pitched samples": "अलग-अलग पिच वाली फ़ाइलें सेव करें",
     "Randomize sample selection": "सैंपल रैंडम चुनें",
     "Peak normalize each sample (pre-pitch)": "हर सैंपल को पीक नॉर्मलाइज़ करें (पिच से पहले)",
-    "Embed FL Studio Slicex slice markers": "Embed FL Studio Slicex slice markers",
+    "Embed FL Studio Slicex slice markers": "FL Studio Slicex स्लाइस मार्कर एम्बेड करें",
     "Theme:": "थीम:",
     "Accent:": "रंग:",
     "Language:": "भाषा:",
@@ -26,6 +30,7 @@ STRINGS = {
     "Wiki": "विकि",
     "Tutorial": "ट्यूटोरियल",
     "&Help": "&मदद",
+
     "Folder not found.": "फ़ोल्डर नहीं मिला।",
     "Need at least 1.wav in this folder.": "इस फ़ोल्डर में कम से कम 1.wav चाहिए।",
     "No sequential samples found (1.wav, 2.wav, ...).": "क्रम में सैंपल नहीं मिले (1.wav, 2.wav, ...)",
@@ -40,16 +45,18 @@ STRINGS = {
     "Done! Saved to {p}": "हो गया! {p} में सेव किया",
     "An error occurred.": "गलती हुई।",
     "⚠️ Generation was cancelled.": "⚠️ जनरेशन रद्द हुई।",
+
     "Footer": "मूल टूल: @ChillSpaceIRL - रीमास्टर्ड: @nullfreq_ और Malloy  |  संस्करण {version} - {month_name} {year}",
     "Join Discord": "डिस्कॉर्ड से जुड़ें",
-    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\\n\\nमूल टूल: @ChillSpaceIRL\\nरीमास्टर्ड: @nullfreq_ और Malloy\\nसंस्करण {version} - {month_name} {year}\\n\\nधन्यवाद!",
+    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\n\nमूल टूल: @ChillSpaceIRL\nरीमास्टर्ड: @nullfreq_ और Malloy\nसंस्करण {version} - {month_name} {year}\n\nधन्यवाद!",
+
     "Found {n} sample(s) (1.wav..{m}.wav).": "{n} सैंपल मिले (1.wav..{m}.wav)।",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "सेमीटोन: {s} | गैप: {g:.3f}से | पिच्ड: {p}",
     "Peak normalization: ON": "पीक नॉर्मलाइज़: चालू",
     "[{a}/{b}] Loading {name}": "[{a}/{b}] {name} लोड हो रहा है",
     "normalized": "नॉर्मलाइज़ किया",
     "Concatenating chromatic scale...": "स्केल जोड़ रहे हैं...",
-    "Embedding FL Studio Slicex slice markers...": "Embedding FL Studio Slicex slice markers...",
+    "Embedding FL Studio Slicex slice markers...": "FL Studio Slicex स्लाइस मार्कर एम्बेड किए जा रहे हैं...",
     "Saved: {path}": "सेव किया: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "{n} पिच्ड सैंपल सेव: {dir}",
 }

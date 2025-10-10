@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
 # i18n_pkg/lang_ko.py (fixed)
+from .meta import BASE_STRINGS
+
+
 STRINGS = {
+    **BASE_STRINGS,
     "Configuration": "설정",
     "Sample folder": "샘플 폴더",
     "Select a folder containing 1.wav, 2.wav, ...": "1.wav, 2.wav 등이 있는 폴더를 선택하세요",
@@ -13,7 +17,7 @@ STRINGS = {
     "Dump individual pitched samples": "변조된 샘플 각각 저장",
     "Randomize sample selection": "샘플 무작위 선택",
     "Peak normalize each sample (pre-pitch)": "각 샘플 피크 정규화(변조 전)",
-    "Embed FL Studio Slicex slice markers": "Embed FL Studio Slicex slice markers",
+    "Embed FL Studio Slicex slice markers": "FL Studio Slicex 슬라이스 마커 포함하기",
     "Theme:": "테마:",
     "Accent:": "포인트 색:",
     "Language:": "언어:",
@@ -26,6 +30,7 @@ STRINGS = {
     "Wiki": "위키",
     "Tutorial": "튜토리얼",
     "&Help": "&도움말",
+
     "Folder not found.": "폴더를 찾을 수 없습니다.",
     "Need at least 1.wav in this folder.": "이 폴더에는 최소한 1.wav가 필요합니다.",
     "No sequential samples found (1.wav, 2.wav, ...).": "연속 샘플(1.wav, 2.wav, ...)을 찾지 못했습니다.",
@@ -40,16 +45,18 @@ STRINGS = {
     "Done! Saved to {p}": "완료! {p}에 저장했습니다",
     "An error occurred.": "오류가 발생했습니다.",
     "⚠️ Generation was cancelled.": "⚠️ 생성이 취소되었습니다.",
+
     "Footer": "원작: @ChillSpaceIRL - 리마스터: @nullfreq_ 및 Malloy  |  버전 {version} - {year}년 {month_number}월",
     "Join Discord": "Discord 참여",
-    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\\n\\n원작: @ChillSpaceIRL\\n리마스터: @nullfreq_ 및 Malloy\\n버전 {version} - {year}년 {month_number}월\\n\\n사용해 주셔서 감사합니다!",
+    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\n\n원작: @ChillSpaceIRL\n리마스터: @nullfreq_ 및 Malloy\n버전 {version} - {year}년 {month_number}월\n\n사용해 주셔서 감사합니다!",
+
     "Found {n} sample(s) (1.wav..{m}.wav).": "샘플 {n}개 발견(1.wav..{m}.wav).",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "반음: {s} | 간격: {g:.3f}초 | 변조: {p}",
     "Peak normalization: ON": "피크 정규화: 켬",
     "[{a}/{b}] Loading {name}": "[{a}/{b}] {name} 불러오는 중",
     "normalized": "정규화됨",
     "Concatenating chromatic scale...": "크로매틱 연결 중...",
-    "Embedding FL Studio Slicex slice markers...": "Embedding FL Studio Slicex slice markers...",
+    "Embedding FL Studio Slicex slice markers...": "FL Studio Slicex 슬라이스 마커를 포함하는 중...",
     "Saved: {path}": "저장됨: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "변조 샘플 {n}개 저장: {dir}",
 }
