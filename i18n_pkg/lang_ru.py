@@ -13,6 +13,7 @@ STRINGS = {
     "Dump individual pitched samples": "Сохранять отдельные семплы с тоном",
     "Randomize sample selection": "Случайный выбор семплов",
     "Peak normalize each sample (pre-pitch)": "Нормализация по пику (до изменения тона)",
+    "Embed FL Studio Slicex slice markers": "Embed FL Studio Slicex slice markers",
     "Theme:": "Тема:",
     "Accent:": "Цвет:",
     "Language:": "Язык:",
@@ -48,6 +49,7 @@ STRINGS = {
     "[{a}/{b}] Loading {name}": "[{a}/{b}] Загрузка {name}",
     "normalized": "нормализовано",
     "Concatenating chromatic scale...": "Склеивание хроматики...",
+    "Embedding FL Studio Slicex slice markers...": "Embedding FL Studio Slicex slice markers...",
     "Saved: {path}": "Сохранено: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "Сохранено {n} семпл(ов) с тоном в: {dir}",
 }

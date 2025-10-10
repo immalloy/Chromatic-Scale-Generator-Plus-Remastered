@@ -13,6 +13,7 @@ STRINGS = {
     "Dump individual pitched samples": "변조된 샘플 각각 저장",
     "Randomize sample selection": "샘플 무작위 선택",
     "Peak normalize each sample (pre-pitch)": "각 샘플 피크 정규화(변조 전)",
+    "Embed FL Studio Slicex slice markers": "Embed FL Studio Slicex slice markers",
     "Theme:": "테마:",
     "Accent:": "포인트 색:",
     "Language:": "언어:",
@@ -48,6 +49,7 @@ STRINGS = {
     "[{a}/{b}] Loading {name}": "[{a}/{b}] {name} 불러오는 중",
     "normalized": "정규화됨",
     "Concatenating chromatic scale...": "크로매틱 연결 중...",
+    "Embedding FL Studio Slicex slice markers...": "Embedding FL Studio Slicex slice markers...",
     "Saved: {path}": "저장됨: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "변조 샘플 {n}개 저장: {dir}",
 }

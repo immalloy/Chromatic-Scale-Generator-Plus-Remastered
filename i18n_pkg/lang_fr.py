@@ -13,6 +13,7 @@ STRINGS = {
     "Dump individual pitched samples": "Enregistrer chaque echantillon transforme",
     "Randomize sample selection": "Choisir des echantillons au hasard",
     "Peak normalize each sample (pre-pitch)": "Normaliser au pic (avant le changement)",
+    "Embed FL Studio Slicex slice markers": "Embed FL Studio Slicex slice markers",
     "Theme:": "Theme:",
     "Accent:": "Couleur:",
     "Language:": "Langue:",
@@ -48,6 +49,7 @@ STRINGS = {
     "[{a}/{b}] Loading {name}": "[{a}/{b}] Chargement de {name}",
     "normalized": "normalise",
     "Concatenating chromatic scale...": "Concatenation de la chromatique...",
+    "Embedding FL Studio Slicex slice markers...": "Embedding FL Studio Slicex slice markers...",
     "Saved: {path}": "Enregistre: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "{n} echantillon(s) transforme(s) enregistre(s) dans: {dir}",
 }

@@ -13,6 +13,7 @@ STRINGS = {
     "Dump individual pitched samples": "各ピッチのサンプルを保存",
     "Randomize sample selection": "サンプルをランダム選択",
     "Peak normalize each sample (pre-pitch)": "各サンプルをピーク正規化(ピッチ前)",
+    "Embed FL Studio Slicex slice markers": "Embed FL Studio Slicex slice markers",
     "Theme:": "テーマ:",
     "Accent:": "色:",
     "Language:": "言語:",
@@ -48,6 +49,7 @@ STRINGS = {
     "[{a}/{b}] Loading {name}": "[{a}/{b}] {name} を読み込み中",
     "normalized": "正規化しました",
     "Concatenating chromatic scale...": "クロマチックを結合中...",
+    "Embedding FL Studio Slicex slice markers...": "Embedding FL Studio Slicex slice markers...",
     "Saved: {path}": "保存しました: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "{n} 個のピッチ済みサンプルを保存: {dir}",
 }

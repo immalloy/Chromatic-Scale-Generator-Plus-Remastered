@@ -13,6 +13,7 @@ STRINGS = {
     "Dump individual pitched samples": "保存每个变调样本",
     "Randomize sample selection": "随机选择样本",
     "Peak normalize each sample (pre-pitch)": "对每个样本峰值归一化(变调前)",
+    "Embed FL Studio Slicex slice markers": "Embed FL Studio Slicex slice markers",
     "Theme:": "主题:",
     "Accent:": "颜色:",
     "Language:": "语言:",
@@ -48,6 +49,7 @@ STRINGS = {
     "[{a}/{b}] Loading {name}": "[{a}/{b}] 正在加载 {name}",
     "normalized": "已归一化",
     "Concatenating chromatic scale...": "正在拼接半音阶...",
+    "Embedding FL Studio Slicex slice markers...": "Embedding FL Studio Slicex slice markers...",
     "Saved: {path}": "已保存: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "已保存 {n} 个变调样本到: {dir}",
 }

@@ -13,6 +13,7 @@ STRINGS = {
     "Dump individual pitched samples": "अलग-अलग पिच वाली फ़ाइलें सेव करें",
     "Randomize sample selection": "सैंपल रैंडम चुनें",
     "Peak normalize each sample (pre-pitch)": "हर सैंपल को पीक नॉर्मलाइज़ करें (पिच से पहले)",
+    "Embed FL Studio Slicex slice markers": "Embed FL Studio Slicex slice markers",
     "Theme:": "थीम:",
     "Accent:": "रंग:",
     "Language:": "भाषा:",
@@ -48,6 +49,7 @@ STRINGS = {
     "[{a}/{b}] Loading {name}": "[{a}/{b}] {name} लोड हो रहा है",
     "normalized": "नॉर्मलाइज़ किया",
     "Concatenating chromatic scale...": "स्केल जोड़ रहे हैं...",
+    "Embedding FL Studio Slicex slice markers...": "Embedding FL Studio Slicex slice markers...",
     "Saved: {path}": "सेव किया: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "{n} पिच्ड सैंपल सेव: {dir}",
 }
