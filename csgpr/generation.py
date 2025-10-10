@@ -152,9 +152,7 @@ class GenerateWorker(QThread):
                     self._emit("  • " + T(self.lang, "normalized"))
 
                 if self.pitched:
-                    snapshot = None
-                    if target_frequency < 60.0:
-                        snapshot = snd.values.copy()
+                    duration = float(snd.get_total_duration())
                     manipulation = parselmouth.praat.call(
                         snd,
                         "To Manipulation",
@@ -167,9 +165,32 @@ class GenerateWorker(QThread):
                     )
                     parselmouth.praat.call(
                         pitch_tier,
-                        "Formula",
-                        f"{target_frequency}",
+                        "Remove points between",
+                        snd.xmin,
+                        snd.xmax,
                     )
+                    start_time = float(snd.xmin)
+                    end_time = float(snd.xmax)
+                    parselmouth.praat.call(
+                        pitch_tier,
+                        "Add point",
+                        start_time,
+                        target_frequency,
+                    )
+                    if duration > 0.0 and end_time > start_time:
+                        parselmouth.praat.call(
+                            pitch_tier,
+                            "Add point",
+                            end_time,
+                            target_frequency,
+                        )
+                    else:
+                        parselmouth.praat.call(
+                            pitch_tier,
+                            "Add point",
+                            start_time + 1e-6,
+                            target_frequency,
+                        )
                     parselmouth.praat.call(
                         [pitch_tier, manipulation], "Replace pitch tier"
                     )
