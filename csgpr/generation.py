@@ -6,7 +6,7 @@ import random
 import struct
 from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Sequence, Tuple
+from typing import List, Sequence
 
 import numpy as np
 import parselmouth
@@ -113,6 +113,7 @@ class GenerateWorker(QThread):
             pitched_sounds: List[parselmouth.Sound] = []
             spaced_sounds: List[parselmouth.Sound] = []
             markers: List[SliceMarker] = []
+            starting_key = self.start_note_index + 12 * (self.start_octave - 2)
             gap_samples = int(gap.get_number_of_samples())
             current_offset = 0
 
@@ -175,8 +176,6 @@ class GenerateWorker(QThread):
                         manipulation, "Get resynthesis (overlap-add)"
                     )
                     current_sound = resynth
-                    if snapshot is not None:
-                        self._quick_pitch_check(snapshot, current_sound.values)
                 else:
                     current_sound = snd
 
@@ -231,30 +230,10 @@ class GenerateWorker(QThread):
             self.error.emit(str(exc))
 
     def _note_label(self, index: int) -> str:
-        note_index, octave = self._note_components(index)
-        name = NOTE_NAMES[note_index]
-        return f"{name}{octave}"
-
-    def _note_components(self, index: int) -> Tuple[int, int]:
         total = self.start_note_index + index
-        note_index = total % len(NOTE_NAMES)
+        name = NOTE_NAMES[total % len(NOTE_NAMES)]
         octave = self.start_octave + (total // len(NOTE_NAMES))
-        return note_index, octave
-
-    def _note_midi_number(self, index: int) -> int:
-        note_index, octave = self._note_components(index)
-        return (octave + 1) * len(NOTE_NAMES) + note_index
-
-    def _note_frequency(self, index: int) -> float:
-        midi_number = self._note_midi_number(index)
-        return 440.0 * (2 ** ((midi_number - 69) / 12))
-
-    def _quick_pitch_check(self, original: np.ndarray, shifted: np.ndarray) -> None:
-        original_arr = np.asarray(original)
-        shifted_arr = np.asarray(shifted)
-        if original_arr.shape != shifted_arr.shape:
-            return
-        assert not np.array_equal(original_arr, shifted_arr)
+        return f"{name}{octave}"
 
 
 __all__ = ["GenerateWorker"]
