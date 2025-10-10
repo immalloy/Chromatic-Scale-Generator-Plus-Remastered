@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 
 from PySide6.QtCore import QUrl, Slot
-from PySide6.QtGui import QAction, QDesktopServices, QIcon
+from PySide6.QtGui import QAction, QDesktopServices, QIcon, QTextCursor
 from PySide6.QtWidgets import (
     QCheckBox,
     QComboBox,
@@ -105,6 +105,9 @@ class MainWindow(QMainWindow):
         self.opt_normalize = QCheckBox(
             T(self.lang, "Peak normalize each sample (pre-pitch)")
         )
+        self.opt_slicex_markers = QCheckBox(
+            T(self.lang, "Embed FL Studio Slicex slice markers")
+        )
 
         self.mode_combo = QComboBox()
         self.mode_combo.addItems(["dark", "light"])
@@ -161,6 +164,9 @@ class MainWindow(QMainWindow):
         row += 1
 
         cfg_layout.addWidget(self.opt_normalize, row, 0, 1, 2)
+        row += 1
+
+        cfg_layout.addWidget(self.opt_slicex_markers, row, 0, 1, 2)
         row += 1
 
         appearance_row = QHBoxLayout()
@@ -294,6 +300,9 @@ class MainWindow(QMainWindow):
         self.opt_random.setText(T(self.lang, "Randomize sample selection"))
         self.opt_normalize.setText(
             T(self.lang, "Peak normalize each sample (pre-pitch)")
+        )
+        self.opt_slicex_markers.setText(
+            T(self.lang, "Embed FL Studio Slicex slice markers")
         )
         self.generate_btn.setText(T(self.lang, "Generate Chromatic"))
         self.cancel_btn.setText(T(self.lang, "Cancel"))
@@ -450,6 +459,7 @@ class MainWindow(QMainWindow):
         dump_samples = self.opt_dump.isChecked()
         randomize = self.opt_random.isChecked()
         normalize = self.opt_normalize.isChecked()
+        slicex_markers = self.opt_slicex_markers.isChecked()
         start_note_index = self.note_combo.currentIndex()
         start_octave = int(self.octave_combo.currentText())
 
@@ -466,6 +476,7 @@ class MainWindow(QMainWindow):
             start_note_index,
             start_octave,
             normalize,
+            slicex_markers,
             self.lang,
         )
         self.worker.progress.connect(self.progress.setValue)
@@ -491,7 +502,7 @@ class MainWindow(QMainWindow):
     @Slot(str)
     def append_log(self, text: str) -> None:
         self.log.append(text)
-        self.log.moveCursor(self.log.textCursor().End)
+        self.log.moveCursor(QTextCursor.End)
 
     @Slot()
     def on_worker_finished(self) -> None:

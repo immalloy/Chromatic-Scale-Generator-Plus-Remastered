@@ -3,8 +3,10 @@ from __future__ import annotations
 """Background worker that generates chromatic scales."""
 
 import random
+import struct
+from dataclasses import dataclass
 from pathlib import Path
-from typing import List
+from typing import List, Sequence, Tuple
 
 import numpy as np
 import parselmouth
@@ -12,7 +14,15 @@ from PySide6.QtCore import QThread, Signal
 
 from i18n_pkg import T
 
-from .constants import DEFAULT_SR
+from .constants import DEFAULT_SR, NOTE_NAMES
+
+
+@dataclass(frozen=True)
+class SliceMarker:
+    """Slice marker information for exported WAV files."""
+
+    offset: int
+    label: str
 
 
 class GenerateWorker(QThread):
@@ -33,6 +43,7 @@ class GenerateWorker(QThread):
         start_note_index: int,
         start_octave: int,
         normalize: bool,
+        slicex_markers: bool,
         lang: str,
         parent=None,
     ) -> None:
@@ -46,6 +57,7 @@ class GenerateWorker(QThread):
         self.start_note_index = start_note_index
         self.start_octave = start_octave
         self.normalize = normalize
+        self.slicex_markers = slicex_markers
         self.lang = lang
         self._cancel = False
 
@@ -100,7 +112,9 @@ class GenerateWorker(QThread):
             )
             pitched_sounds: List[parselmouth.Sound] = []
             spaced_sounds: List[parselmouth.Sound] = []
-            starting_key = self.start_note_index + 12 * (self.start_octave - 2)
+            markers: List[SliceMarker] = []
+            gap_samples = int(gap.get_number_of_samples())
+            current_offset = 0
 
             for i in range(self.semitones):
                 if self._cancel:
@@ -125,6 +139,7 @@ class GenerateWorker(QThread):
                 snd = parselmouth.Sound(str(file_path))
                 snd = parselmouth.praat.call(snd, "Resample", DEFAULT_SR, 1)
                 snd = parselmouth.praat.call(snd, "Convert to mono")
+                target_frequency = self._note_frequency(i)
 
                 if self.normalize:
                     arr = snd.values.copy()
@@ -135,8 +150,15 @@ class GenerateWorker(QThread):
                     self._emit("  • " + T(self.lang, "normalized"))
 
                 if self.pitched:
+                    snapshot = None
+                    if target_frequency < 60.0:
+                        snapshot = snd.values.copy()
                     manipulation = parselmouth.praat.call(
-                        snd, "To Manipulation", 0.05, 60, 600
+                        snd,
+                        "To Manipulation",
+                        0.05,
+                        20.0 if target_frequency < 60.0 else 60.0,
+                        600,
                     )
                     pitch_tier = parselmouth.praat.call(
                         manipulation, "Extract pitch tier"
@@ -144,7 +166,7 @@ class GenerateWorker(QThread):
                     parselmouth.praat.call(
                         pitch_tier,
                         "Formula",
-                        f"32.703 * (2 ^ ({i + starting_key + 12}/12))",
+                        f"{target_frequency}",
                     )
                     parselmouth.praat.call(
                         [pitch_tier, manipulation], "Replace pitch tier"
@@ -152,13 +174,23 @@ class GenerateWorker(QThread):
                     resynth = parselmouth.praat.call(
                         manipulation, "Get resynthesis (overlap-add)"
                     )
-                    pitched_sounds.append(resynth)
-                    spaced_sounds.append(resynth)
+                    current_sound = resynth
+                    if snapshot is not None:
+                        self._quick_pitch_check(snapshot, current_sound.values)
                 else:
-                    pitched_sounds.append(snd)
-                    spaced_sounds.append(snd)
+                    current_sound = snd
+
+                pitched_sounds.append(current_sound)
+                spaced_sounds.append(current_sound)
+
+                if self.slicex_markers:
+                    label = self._note_label(i)
+                    markers.append(SliceMarker(offset=current_offset, label=label))
+
+                current_offset += int(current_sound.get_number_of_samples())
 
                 spaced_sounds.append(gap)
+                current_offset += gap_samples
                 pct = int(((i + 1) / self.semitones) * 90)
                 self.progress.emit(min(99, max(1, pct)))
 
@@ -169,7 +201,13 @@ class GenerateWorker(QThread):
             self._emit(T(self.lang, "Concatenating chromatic scale..."))
             chromatic = parselmouth.Sound.concatenate(spaced_sounds)
             out_path = self.sample_path / "chromatic.wav"
-            chromatic.save(str(out_path), "WAV")
+            if self.slicex_markers:
+                self._emit(
+                    T(self.lang, "Embedding FL Studio Slicex slice markers...")
+                )
+                save_sound_with_markers(chromatic, out_path, markers)
+            else:
+                chromatic.save(str(out_path), "WAV")
             self._emit(T(self.lang, "Saved: {path}", path=out_path))
 
             if self.dump_samples and self.pitched:
@@ -191,3 +229,84 @@ class GenerateWorker(QThread):
             self.done.emit(str(out_path))
         except Exception as exc:  # pragma: no cover - GUI thread
             self.error.emit(str(exc))
+
+    def _note_label(self, index: int) -> str:
+        note_index, octave = self._note_components(index)
+        name = NOTE_NAMES[note_index]
+        return f"{name}{octave}"
+
+    def _note_components(self, index: int) -> Tuple[int, int]:
+        total = self.start_note_index + index
+        note_index = total % len(NOTE_NAMES)
+        octave = self.start_octave + (total // len(NOTE_NAMES))
+        return note_index, octave
+
+    def _note_midi_number(self, index: int) -> int:
+        note_index, octave = self._note_components(index)
+        return (octave + 1) * len(NOTE_NAMES) + note_index
+
+    def _note_frequency(self, index: int) -> float:
+        midi_number = self._note_midi_number(index)
+        return 440.0 * (2 ** ((midi_number - 69) / 12))
+
+    def _quick_pitch_check(self, original: np.ndarray, shifted: np.ndarray) -> None:
+        original_arr = np.asarray(original)
+        shifted_arr = np.asarray(shifted)
+        if original_arr.shape != shifted_arr.shape:
+            return
+        assert not np.array_equal(original_arr, shifted_arr)
+
+
+__all__ = ["GenerateWorker"]
+
+
+def _pack_chunk(chunk_id: bytes, body: bytes) -> bytes:
+    chunk = chunk_id + struct.pack("<I", len(body)) + body
+    if len(body) % 2 == 1:
+        chunk += b"\x00"
+    return chunk
+
+
+def save_sound_with_markers(
+    sound: parselmouth.Sound, out_path: Path, markers: Sequence[SliceMarker]
+) -> None:
+    if not markers:
+        sound.save(str(out_path), "WAV")
+        return
+
+    sr = int(sound.sampling_frequency)
+    channels = int(sound.get_number_of_channels())
+
+    values = np.asarray(sound.values)
+    clipped = np.clip(values, -1.0, 1.0)
+    pcm = np.rint(clipped * 32767.0).astype("<i2")
+    interleaved = np.ascontiguousarray(np.transpose(pcm))
+    data_bytes = interleaved.tobytes()
+
+    byte_rate = sr * channels * 2
+    block_align = channels * 2
+    fmt_body = struct.pack("<HHIIHH", 1, channels, sr, byte_rate, block_align, 16)
+    fmt_chunk = _pack_chunk(b"fmt ", fmt_body)
+    data_chunk = _pack_chunk(b"data", data_bytes)
+
+    cue_body = struct.pack("<I", len(markers))
+    list_body = b"adtl"
+
+    for cue_id, marker in enumerate(markers, start=1):
+        sample_offset = max(0, int(marker.offset))
+        cue_body += struct.pack(
+            "<II4sIII", cue_id, sample_offset, b"data", 0, 0, sample_offset
+        )
+
+        label_text = marker.label.encode("utf-8") + b"\x00"
+        label_body = struct.pack("<I", cue_id) + label_text
+        list_body += _pack_chunk(b"labl", label_body)
+
+    cue_chunk = _pack_chunk(b"cue ", cue_body)
+    list_chunk = _pack_chunk(b"LIST", list_body)
+
+    riff_body = b"WAVE" + fmt_chunk + data_chunk + cue_chunk + list_chunk
+    riff_chunk = b"RIFF" + struct.pack("<I", len(riff_body)) + riff_body
+
+    with open(out_path, "wb") as handle:
+        handle.write(riff_chunk)
