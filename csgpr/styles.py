@@ -34,28 +34,28 @@ PALETTES: dict[PaletteKey, Palette] = {
         muted="#9A9A9A",
     ),
     ("light", "blue"): dict(
-        bg="#F4F6FB",
+        bg="#FFFFFF",
         panel="#FFFFFF",
         text="#202124",
-        sub="#596072",
+        sub="#3C404B",
         field="#FFFFFF",
-        border="#D2D6E5",
+        border="#CDD5E6",
         accent="#2D7CF3",
         accent2="#4D90FE",
         warn="#B3261E",
-        muted="#6F7383",
+        muted="#5F6368",
     ),
     ("light", "pink"): dict(
-        bg="#FBF6FA",
+        bg="#FFFFFF",
         panel="#FFFFFF",
-        text="#251723",
-        sub="#7A4D63",
+        text="#2A1724",
+        sub="#6B3B53",
         field="#FFFFFF",
-        border="#E3D0DA",
+        border="#E4CAD7",
         accent="#F44A91",
         accent2="#FF7FBF",
         warn="#B3261E",
-        muted="#8A6F7B",
+        muted="#80616F",
     ),
 }
 
@@ -93,7 +93,10 @@ def build_stylesheet(mode: str, accent: str) -> str:
     )
     return f"""
         QMainWindow {{ background: {palette['bg']}; }}
-        QWidget {{ color: {palette['text']}; }}
+        QWidget {{
+            background: {palette['bg']};
+            color: {palette['text']};
+        }}
         QGroupBox {{
             color: {palette['text']};
             border: 1px solid {palette['border']};
@@ -121,6 +124,9 @@ def build_stylesheet(mode: str, accent: str) -> str:
             color: {palette['text']};
             selection-background-color: {palette['accent2']};
             selection-color: {highlight_text};
+        }}
+        QLineEdit::placeholder, QTextEdit::placeholder, QPlainTextEdit::placeholder {{
+            color: {palette['muted']};
         }}
         QComboBox {{
             padding-right: 40px;
@@ -246,5 +252,15 @@ def build_stylesheet(mode: str, accent: str) -> str:
         }}
         #Footer {{ color: {palette['sub']}; font-size: 12px; padding: 8px 0; }}
         #WarnLabel {{ color: {palette['warn']}; font-size: 12px; }}
-        #LinkButton {{ background: transparent; color: {palette['accent']}; border: none; text-decoration: underline; padding: 0px; font-weight: 600; }}
+        #LinkButton {{
+            background: transparent;
+            color: {palette['accent']};
+            border: none;
+            text-decoration: underline;
+            padding: 0px;
+            font-weight: 600;
+        }}
+        #LinkButton:hover {{ color: {palette['accent2']}; }}
+        #LinkButton:pressed {{ color: {palette['accent']}; opacity: 0.8; }}
+        #LinkButton:disabled {{ color: {palette['muted']}; }}
     """
