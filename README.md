@@ -65,6 +65,12 @@ Open **Configuration → Custom Order**, choose **Import** (or **Template → Im
 
 ---
 
+## 📘 New to the App? Start with the Tutorial
+
+If you or your collaborators are launching the tool for the first time, follow the step-by-step guide in [`docs/TUTORIAL.md`](docs/TUTORIAL.md). It walks through installation, the UI layout, sample tagging, preset editing, template workflows, and troubleshooting—no technical background required.
+
+---
+
 ## Perfect For
 
 * **FNF musicians** creating or refining character voicebanks
