@@ -9,6 +9,7 @@ from pathlib import Path
 from PySide6.QtCore import QUrl, Slot
 from PySide6.QtGui import QAction, QDesktopServices, QIcon, QTextCursor
 from PySide6.QtWidgets import (
+    QButtonGroup,
     QCheckBox,
     QComboBox,
     QDoubleSpinBox,
@@ -16,11 +17,13 @@ from PySide6.QtWidgets import (
     QGroupBox,
     QGridLayout,
     QHBoxLayout,
+    QInputDialog,
     QLabel,
     QLineEdit,
     QMainWindow,
     QMessageBox,
     QProgressBar,
+    QRadioButton,
     QPushButton,
     QSpinBox,
     QStatusBar,
@@ -41,7 +44,22 @@ from .constants import (
     PROJECT_TUTORIAL_URL,
     PROJECT_WIKI_URL,
 )
-from .dialogs import CreditsDialog
+from .custom_order import (
+    DEFAULT_SYMBOLS,
+    CustomOrderPreset,
+    CustomTemplate,
+    PresetError,
+    ResolutionError,
+    ResolutionResult,
+    build_default_sequence,
+    export_preset,
+    export_template,
+    import_preset,
+    import_template,
+    resolve_sequence,
+    scan_symbol_buckets,
+)
+from .dialogs import CreditsDialog, CustomPreviewDialog, PresetEditorDialog
 from .generation import GenerateWorker
 from .styles import build_stylesheet
 
@@ -102,12 +120,101 @@ class MainWindow(QMainWindow):
         self.opt_pitched.setChecked(True)
         self.opt_dump = QCheckBox(T(self.lang, "Dump individual pitched samples"))
         self.opt_random = QCheckBox(T(self.lang, "Randomize sample selection"))
+        self.opt_random.setVisible(False)
         self.opt_normalize = QCheckBox(
             T(self.lang, "Peak normalize each sample (pre-pitch)")
         )
         self.opt_slicex_markers = QCheckBox(
             T(self.lang, "Embed FL Studio Slicex slice markers")
         )
+
+        self.mode_label = QLabel(T(self.lang, "ModeLabel"))
+        self.mode_normal_radio = QRadioButton(T(self.lang, "ModeNormal"))
+        self.mode_random_radio = QRadioButton(T(self.lang, "ModeRandom"))
+        self.mode_custom_radio = QRadioButton(T(self.lang, "ModeCustom"))
+        self.mode_group = QButtonGroup(self)
+        self.mode_group.addButton(self.mode_normal_radio)
+        self.mode_group.addButton(self.mode_random_radio)
+        self.mode_group.addButton(self.mode_custom_radio)
+        self.mode_normal_radio.setChecked(True)
+
+        self.custom_widget = QWidget()
+        custom_layout = QGridLayout(self.custom_widget)
+        custom_layout.setContentsMargins(0, 0, 0, 0)
+
+        self.preset_label = QLabel(T(self.lang, "PresetLabel"))
+        self.preset_combo = QComboBox()
+        self.preset_combo.addItem(T(self.lang, "PresetNone"), None)
+        custom_layout.addWidget(self.preset_label, 0, 0)
+        custom_layout.addWidget(self.preset_combo, 0, 1, 1, 3)
+
+        self.preset_new_btn = QPushButton(T(self.lang, "PresetNew"))
+        self.preset_edit_btn = QPushButton(T(self.lang, "PresetEdit"))
+        self.preset_save_as_btn = QPushButton(T(self.lang, "PresetSaveAs"))
+        self.preset_delete_btn = QPushButton(T(self.lang, "PresetDelete"))
+        self.preset_import_btn = QPushButton(T(self.lang, "PresetImport"))
+        self.preset_export_btn = QPushButton(T(self.lang, "PresetExport"))
+
+        button_row = QHBoxLayout()
+        button_row.addWidget(self.preset_new_btn)
+        button_row.addWidget(self.preset_edit_btn)
+        button_row.addWidget(self.preset_save_as_btn)
+        button_row.addWidget(self.preset_delete_btn)
+        button_row.addWidget(self.preset_import_btn)
+        button_row.addWidget(self.preset_export_btn)
+        button_row.addStretch(1)
+        custom_layout.addLayout(button_row, 1, 0, 1, 4)
+
+        self.selection_label = QLabel(T(self.lang, "Selection policy"))
+        self.selection_combo = QComboBox()
+        self.selection_combo.addItem(T(self.lang, "SelectionFirst"), "first")
+        self.selection_combo.addItem(T(self.lang, "SelectionCycle"), "cycle")
+        self.selection_combo.addItem(T(self.lang, "SelectionRandom"), "random")
+        self.selection_seed = QSpinBox()
+        self.selection_seed.setRange(0, 999999)
+        self.selection_seed.setEnabled(False)
+        custom_layout.addWidget(self.selection_label, 2, 0)
+        seed_row = QHBoxLayout()
+        seed_row.addWidget(self.selection_combo)
+        seed_row.addWidget(self.selection_seed)
+        custom_layout.addLayout(seed_row, 2, 1, 1, 3)
+        self.selection_combo.setCurrentIndex(0)
+
+        self.length_label = QLabel(T(self.lang, "Length handling"))
+        self.length_combo = QComboBox()
+        self.length_combo.addItem(T(self.lang, "LengthPad"), "pad")
+        self.length_combo.addItem(T(self.lang, "LengthTruncate"), "truncate")
+        self.length_combo.addItem(T(self.lang, "LengthError"), "error")
+        custom_layout.addWidget(self.length_label, 3, 0)
+        custom_layout.addWidget(self.length_combo, 3, 1, 1, 3)
+        self.length_combo.setCurrentIndex(0)
+
+        self.missing_label = QLabel(T(self.lang, "Missing symbol"))
+        self.missing_combo = QComboBox()
+        self.missing_combo.addItem(T(self.lang, "MissingSkip"), "skip")
+        self.missing_combo.addItem(T(self.lang, "MissingAsk"), "ask")
+        self.missing_combo.addItem(T(self.lang, "MissingError"), "error")
+        custom_layout.addWidget(self.missing_label, 4, 0)
+        custom_layout.addWidget(self.missing_combo, 4, 1, 1, 3)
+        self.missing_combo.setCurrentIndex(0)
+
+        self.preview_btn = QPushButton(T(self.lang, "Preview"))
+        custom_layout.addWidget(self.preview_btn, 5, 0)
+
+        self.template_save_btn = QPushButton(T(self.lang, "TemplateSave"))
+        self.template_load_btn = QPushButton(T(self.lang, "TemplateLoad"))
+        self.template_import_btn = QPushButton(T(self.lang, "TemplateImport"))
+        self.template_export_btn = QPushButton(T(self.lang, "TemplateExport"))
+
+        template_row = QHBoxLayout()
+        template_row.addWidget(self.template_save_btn)
+        template_row.addWidget(self.template_load_btn)
+        template_row.addWidget(self.template_import_btn)
+        template_row.addWidget(self.template_export_btn)
+        template_row.addStretch(1)
+        custom_layout.addLayout(template_row, 5, 1, 1, 3)
+
+        self.custom_widget.setEnabled(False)
 
         self.mode_combo = QComboBox()
         self.mode_combo.addItems(["dark", "light"])
@@ -160,7 +267,16 @@ class MainWindow(QMainWindow):
         cfg_layout.addWidget(self.opt_dump, row, 0, 1, 2)
         row += 1
 
-        cfg_layout.addWidget(self.opt_random, row, 0, 1, 2)
+        mode_row = QHBoxLayout()
+        mode_row.addWidget(self.mode_label)
+        mode_row.addWidget(self.mode_normal_radio)
+        mode_row.addWidget(self.mode_random_radio)
+        mode_row.addWidget(self.mode_custom_radio)
+        mode_row.addStretch(1)
+        cfg_layout.addLayout(mode_row, row, 0, 1, 2)
+        row += 1
+
+        cfg_layout.addWidget(self.custom_widget, row, 0, 1, 2)
         row += 1
 
         cfg_layout.addWidget(self.opt_normalize, row, 0, 1, 2)
@@ -260,9 +376,35 @@ class MainWindow(QMainWindow):
         self.wiki_btn.clicked.connect(self.open_wiki)
         self.tutorial_btn.clicked.connect(self.open_tutorial)
         self.credits_btn.clicked.connect(self.show_credits)
+        self.mode_normal_radio.toggled.connect(self.on_mode_selection_changed)
+        self.mode_random_radio.toggled.connect(self.on_mode_selection_changed)
+        self.mode_custom_radio.toggled.connect(self.on_mode_selection_changed)
+        self.preset_combo.currentIndexChanged.connect(self.on_preset_changed)
+        self.preset_new_btn.clicked.connect(self.on_preset_new)
+        self.preset_edit_btn.clicked.connect(self.on_preset_edit)
+        self.preset_save_as_btn.clicked.connect(self.on_preset_save_as)
+        self.preset_delete_btn.clicked.connect(self.on_preset_delete)
+        self.preset_import_btn.clicked.connect(self.on_preset_import)
+        self.preset_export_btn.clicked.connect(self.on_preset_export)
+        self.selection_combo.currentIndexChanged.connect(
+            self.on_selection_policy_changed
+        )
+        self.selection_seed.valueChanged.connect(self.on_selection_seed_changed)
+        self.length_combo.currentIndexChanged.connect(self.on_length_policy_changed)
+        self.missing_combo.currentIndexChanged.connect(self.on_missing_policy_changed)
+        self.preview_btn.clicked.connect(self.on_preview_clicked)
+        self.template_save_btn.clicked.connect(self.on_template_save)
+        self.template_load_btn.clicked.connect(self.on_template_load)
+        self.template_import_btn.clicked.connect(self.on_template_import)
+        self.template_export_btn.clicked.connect(self.on_template_export)
 
         self.worker: GenerateWorker | None = None
         self.last_output_path: Path | None = None
+        self.current_mode = "normal"
+        self.custom_presets: dict[str, CustomOrderPreset] = {}
+        self.active_preset: CustomOrderPreset | None = None
+        self.custom_templates: dict[str, CustomTemplate] = {}
+        self.last_resolution: ResolutionResult | None = None
 
         self.setAcceptDrops(True)
         self.refresh_validation()
@@ -304,6 +446,35 @@ class MainWindow(QMainWindow):
         self.opt_slicex_markers.setText(
             T(self.lang, "Embed FL Studio Slicex slice markers")
         )
+        self.mode_label.setText(T(self.lang, "ModeLabel"))
+        self.mode_normal_radio.setText(T(self.lang, "ModeNormal"))
+        self.mode_random_radio.setText(T(self.lang, "ModeRandom"))
+        self.mode_custom_radio.setText(T(self.lang, "ModeCustom"))
+        self.preset_label.setText(T(self.lang, "PresetLabel"))
+        self.preset_new_btn.setText(T(self.lang, "PresetNew"))
+        self.preset_edit_btn.setText(T(self.lang, "PresetEdit"))
+        self.preset_save_as_btn.setText(T(self.lang, "PresetSaveAs"))
+        self.preset_delete_btn.setText(T(self.lang, "PresetDelete"))
+        self.preset_import_btn.setText(T(self.lang, "PresetImport"))
+        self.preset_export_btn.setText(T(self.lang, "PresetExport"))
+        self.preset_combo.setItemText(0, T(self.lang, "PresetNone"))
+        self.selection_label.setText(T(self.lang, "Selection policy"))
+        self.selection_combo.setItemText(0, T(self.lang, "SelectionFirst"))
+        self.selection_combo.setItemText(1, T(self.lang, "SelectionCycle"))
+        self.selection_combo.setItemText(2, T(self.lang, "SelectionRandom"))
+        self.length_label.setText(T(self.lang, "Length handling"))
+        self.length_combo.setItemText(0, T(self.lang, "LengthPad"))
+        self.length_combo.setItemText(1, T(self.lang, "LengthTruncate"))
+        self.length_combo.setItemText(2, T(self.lang, "LengthError"))
+        self.missing_label.setText(T(self.lang, "Missing symbol"))
+        self.missing_combo.setItemText(0, T(self.lang, "MissingSkip"))
+        self.missing_combo.setItemText(1, T(self.lang, "MissingAsk"))
+        self.missing_combo.setItemText(2, T(self.lang, "MissingError"))
+        self.preview_btn.setText(T(self.lang, "Preview"))
+        self.template_save_btn.setText(T(self.lang, "TemplateSave"))
+        self.template_load_btn.setText(T(self.lang, "TemplateLoad"))
+        self.template_import_btn.setText(T(self.lang, "TemplateImport"))
+        self.template_export_btn.setText(T(self.lang, "TemplateExport"))
         self.generate_btn.setText(T(self.lang, "Generate Chromatic"))
         self.cancel_btn.setText(T(self.lang, "Cancel"))
         self.open_out_btn.setText(T(self.lang, "Open Output Folder"))
@@ -332,6 +503,392 @@ class MainWindow(QMainWindow):
         help_menu.addAction(act_credits)
 
         self.refresh_validation()
+
+    def on_mode_selection_changed(self) -> None:
+        if self.mode_normal_radio.isChecked():
+            self.current_mode = "normal"
+        elif self.mode_random_radio.isChecked():
+            self.current_mode = "random"
+        else:
+            self.current_mode = "custom"
+        self.custom_widget.setEnabled(self.current_mode == "custom")
+        self.selection_seed.setEnabled(
+            self.current_mode == "custom"
+            and self.selection_combo.currentData() == "random"
+        )
+        self.opt_random.setChecked(self.current_mode == "random")
+        self.refresh_button_state()
+
+    def refresh_preset_combo(self, select: str | None = None) -> None:
+        if select is None and self.active_preset:
+            select = self.active_preset.name
+        self.preset_combo.blockSignals(True)
+        current_index = self.preset_combo.currentIndex()
+        self.preset_combo.clear()
+        self.preset_combo.addItem(T(self.lang, "PresetNone"), None)
+        for name in sorted(self.custom_presets.keys(), key=str.casefold):
+            self.preset_combo.addItem(name, name)
+        self.preset_combo.blockSignals(False)
+        if select:
+            idx = self.preset_combo.findData(select)
+            if idx >= 0:
+                self.preset_combo.setCurrentIndex(idx)
+            else:
+                self.preset_combo.setCurrentIndex(0)
+        else:
+            self.preset_combo.setCurrentIndex(min(current_index, self.preset_combo.count() - 1))
+        self.on_preset_changed()
+
+    def set_active_preset(self, preset: CustomOrderPreset | None) -> None:
+        self.active_preset = preset
+        block_sel = self.selection_combo.blockSignals(True)
+        block_len = self.length_combo.blockSignals(True)
+        block_miss = self.missing_combo.blockSignals(True)
+        try:
+            if preset is None:
+                self.selection_combo.setCurrentIndex(0)
+                self.selection_seed.setValue(0)
+                self.selection_seed.setEnabled(False)
+                self.length_combo.setCurrentIndex(0)
+                self.missing_combo.setCurrentIndex(0)
+            else:
+                idx = self.selection_combo.findData(preset.policy.mode)
+                if idx >= 0:
+                    self.selection_combo.setCurrentIndex(idx)
+                if preset.policy.seed is not None:
+                    self.selection_seed.setValue(int(preset.policy.seed))
+                self.selection_seed.setEnabled(
+                    self.current_mode == "custom"
+                    and self.selection_combo.currentData() == "random"
+                )
+                idx = self.length_combo.findData(preset.length_policy)
+                if idx >= 0:
+                    self.length_combo.setCurrentIndex(idx)
+                idx = self.missing_combo.findData(preset.on_missing_symbol)
+                if idx >= 0:
+                    self.missing_combo.setCurrentIndex(idx)
+        finally:
+            self.selection_combo.blockSignals(block_sel)
+            self.length_combo.blockSignals(block_len)
+            self.missing_combo.blockSignals(block_miss)
+        self.refresh_button_state()
+
+    def on_preset_changed(self) -> None:
+        data = self.preset_combo.currentData()
+        if data is None:
+            self.set_active_preset(None)
+            return
+        preset = self.custom_presets.get(data)
+        if preset:
+            self.set_active_preset(preset)
+
+    def clone_preset(self, preset: CustomOrderPreset) -> CustomOrderPreset:
+        return CustomOrderPreset(
+            name=preset.name,
+            symbols=list(preset.symbols),
+            order=list(preset.order),
+            policy=SelectionPolicy(
+                mode=preset.policy.mode,
+                seed=preset.policy.seed,
+            ),
+            length_policy=preset.length_policy,
+            on_missing_symbol=preset.on_missing_symbol,
+        )
+
+    def on_preset_new(self) -> None:
+        dialog = PresetEditorDialog(self.lang, DEFAULT_SYMBOLS, parent=self)
+        if dialog.exec() == QDialog.Accepted:
+            preset = dialog.result()
+            if preset:
+                self.custom_presets[preset.name] = preset
+                self.refresh_preset_combo(select=preset.name)
+
+    def on_preset_edit(self) -> None:
+        if not self.active_preset:
+            self.show_info(T(self.lang, "PresetSelectPrompt"))
+            return
+        dialog = PresetEditorDialog(
+            self.lang,
+            self.active_preset.symbols,
+            preset=self.clone_preset(self.active_preset),
+            parent=self,
+        )
+        if dialog.exec() == QDialog.Accepted:
+            preset = dialog.result()
+            if preset:
+                self.custom_presets.pop(self.active_preset.name, None)
+                self.custom_presets[preset.name] = preset
+                self.refresh_preset_combo(select=preset.name)
+
+    def on_preset_save_as(self) -> None:
+        if not self.active_preset:
+            self.show_info(T(self.lang, "PresetSelectPrompt"))
+            return
+        clone = self.clone_preset(self.active_preset)
+        clone.name = clone.name + " Copy"
+        dialog = PresetEditorDialog(
+            self.lang,
+            clone.symbols,
+            preset=clone,
+            parent=self,
+        )
+        if dialog.exec() == QDialog.Accepted:
+            preset = dialog.result()
+            if preset:
+                self.custom_presets[preset.name] = preset
+                self.refresh_preset_combo(select=preset.name)
+
+    def on_preset_delete(self) -> None:
+        data = self.preset_combo.currentData()
+        if data is None:
+            return
+        if not self.ask_yes_no(
+            APP_TITLE,
+            T(self.lang, "PresetDeleteConfirm", name=str(data)),
+        ):
+            return
+        self.custom_presets.pop(str(data), None)
+        self.refresh_preset_combo(select=None)
+
+    def on_preset_import(self) -> None:
+        filename, _ = QFileDialog.getOpenFileName(
+            self,
+            T(self.lang, "PresetImportTitle"),
+            str(self.path_edit.text() or Path.home()),
+            "Custom Order (*.csgorder.json)",
+        )
+        if not filename:
+            return
+        try:
+            preset = import_preset(Path(filename))
+        except Exception as exc:
+            self.show_error(str(exc))
+            return
+        self.custom_presets[preset.name] = preset
+        self.refresh_preset_combo(select=preset.name)
+
+    def on_preset_export(self) -> None:
+        if not self.active_preset:
+            self.show_info(T(self.lang, "PresetSelectPrompt"))
+            return
+        filename, _ = QFileDialog.getSaveFileName(
+            self,
+            T(self.lang, "PresetExportTitle"),
+            self.active_preset.name + ".csgorder.json",
+            "Custom Order (*.csgorder.json)",
+        )
+        if not filename:
+            return
+        try:
+            export_preset(self.active_preset, Path(filename))
+        except Exception as exc:
+            self.show_error(str(exc))
+
+    def on_selection_policy_changed(self) -> None:
+        mode = self.selection_combo.currentData()
+        self.selection_seed.setEnabled(
+            self.current_mode == "custom" and mode == "random"
+        )
+        if self.active_preset:
+            self.active_preset.policy = SelectionPolicy(
+                mode=str(mode),
+                seed=self.selection_seed.value()
+                if mode == "random"
+                else None,
+            )
+
+    def on_selection_seed_changed(self, value: int) -> None:
+        if self.active_preset and self.active_preset.policy.mode == "random":
+            self.active_preset.policy = SelectionPolicy(
+                mode=self.active_preset.policy.mode,
+                seed=value,
+            )
+
+    def on_length_policy_changed(self) -> None:
+        if self.active_preset:
+            self.active_preset.length_policy = str(self.length_combo.currentData())
+
+    def on_missing_policy_changed(self) -> None:
+        if self.active_preset:
+            self.active_preset.on_missing_symbol = str(
+                self.missing_combo.currentData()
+            )
+
+    def resolve_current_preset(
+        self, *, report: bool = True
+    ) -> tuple[ResolutionResult, list[str]] | None:
+        if not self.folder_valid():
+            if report:
+                self.show_error(
+                    T(self.lang, "Invalid folder. Place '1.wav', '2.wav', ... in it.")
+                )
+            return None
+        if not self.active_preset:
+            if report:
+                self.show_info(T(self.lang, "PresetSelectPrompt"))
+            return None
+        sample_path = Path(self.path_edit.text().strip())
+        try:
+            scan_result = scan_symbol_buckets(
+                sample_path, allowed_symbols=self.active_preset.symbols
+            )
+            result = resolve_sequence(
+                self.active_preset,
+                scan_result.buckets,
+                target_length=int(self.range_spin.value()),
+            )
+        except (PresetError, ResolutionError) as exc:
+            if report:
+                self.show_error(str(exc))
+            return None
+        self.last_resolution = result
+        if report:
+            for warning in scan_result.warnings:
+                self.append_log(T(self.lang, "WarningLog", msg=warning))
+        return result, scan_result.warnings
+
+    def on_preview_clicked(self) -> None:
+        resolved = self.resolve_current_preset(report=True)
+        if not resolved:
+            return
+        result, _warnings = resolved
+        dialog = CustomPreviewDialog(self.lang, result.preview, self)
+        dialog.exec()
+
+    def capture_settings(self) -> dict[str, object]:
+        return {
+            "note_index": self.note_combo.currentIndex(),
+            "octave": int(self.octave_combo.currentText()),
+            "semitones": int(self.range_spin.value()),
+            "gap": float(self.gap_spin.value()),
+            "pitched": self.opt_pitched.isChecked(),
+            "dump": self.opt_dump.isChecked(),
+            "normalize": self.opt_normalize.isChecked(),
+            "slicex": self.opt_slicex_markers.isChecked(),
+            "mode": self.current_mode,
+            "preset": self.active_preset.name if self.active_preset else None,
+        }
+
+    def apply_settings(self, settings: dict[str, object]) -> None:
+        note_index = int(settings.get("note_index", self.note_combo.currentIndex()))
+        if 0 <= note_index < self.note_combo.count():
+            self.note_combo.setCurrentIndex(note_index)
+        octave = settings.get("octave")
+        if octave is not None:
+            self.octave_combo.setCurrentText(str(int(octave)))
+        semitones = int(settings.get("semitones", self.range_spin.value()))
+        self.range_spin.setValue(semitones)
+        gap = settings.get("gap")
+        if gap is not None:
+            self.gap_spin.setValue(float(gap))
+        self.opt_pitched.setChecked(bool(settings.get("pitched", True)))
+        self.opt_dump.setChecked(bool(settings.get("dump", False)))
+        self.opt_normalize.setChecked(bool(settings.get("normalize", False)))
+        self.opt_slicex_markers.setChecked(bool(settings.get("slicex", False)))
+        mode = settings.get("mode", "normal")
+        if mode == "random":
+            self.mode_random_radio.setChecked(True)
+        elif mode == "custom":
+            self.mode_custom_radio.setChecked(True)
+        else:
+            self.mode_normal_radio.setChecked(True)
+        preset_name = settings.get("preset")
+        if isinstance(preset_name, str) and preset_name in self.custom_presets:
+            idx = self.preset_combo.findData(preset_name)
+            if idx >= 0:
+                self.preset_combo.setCurrentIndex(idx)
+
+    def on_template_save(self) -> None:
+        if not self.active_preset:
+            self.show_info(T(self.lang, "PresetSelectPrompt"))
+            return
+        name, ok = QInputDialog.getText(
+            self,
+            T(self.lang, "TemplateSaveTitle"),
+            T(self.lang, "TemplateNamePrompt"),
+        )
+        if not ok or not name.strip():
+            return
+        template = CustomTemplate(
+            name=name.strip(),
+            preset=self.clone_preset(self.active_preset),
+            settings=self.capture_settings(),
+        )
+        self.custom_templates[template.name] = template
+        self.show_info(T(self.lang, "TemplateSaved", name=template.name))
+
+    def apply_template(self, template: CustomTemplate) -> None:
+        self.custom_presets[template.preset.name] = template.preset
+        self.refresh_preset_combo(select=template.preset.name)
+        self.apply_settings(template.settings)
+
+    def on_template_load(self) -> None:
+        if not self.custom_templates:
+            self.show_info(T(self.lang, "TemplateNone"))
+            return
+        names = sorted(self.custom_templates.keys(), key=str.casefold)
+        name, ok = QInputDialog.getItem(
+            self,
+            T(self.lang, "TemplateLoadTitle"),
+            T(self.lang, "TemplateChoosePrompt"),
+            names,
+            0,
+            False,
+        )
+        if not ok or not name:
+            return
+        template = self.custom_templates.get(name)
+        if template:
+            self.apply_template(template)
+
+    def on_template_import(self) -> None:
+        filename, _ = QFileDialog.getOpenFileName(
+            self,
+            T(self.lang, "TemplateImportTitle"),
+            str(self.path_edit.text() or Path.home()),
+            "Templates (*.csgtemplate.json)",
+        )
+        if not filename:
+            return
+        try:
+            template = import_template(Path(filename))
+        except Exception as exc:
+            self.show_error(str(exc))
+            return
+        self.custom_templates[template.name] = template
+        self.apply_template(template)
+        self.show_info(T(self.lang, "TemplateImported", name=template.name))
+
+    def on_template_export(self) -> None:
+        if not self.custom_templates:
+            self.show_info(T(self.lang, "TemplateNone"))
+            return
+        names = sorted(self.custom_templates.keys(), key=str.casefold)
+        name, ok = QInputDialog.getItem(
+            self,
+            T(self.lang, "TemplateExportTitle"),
+            T(self.lang, "TemplateChoosePrompt"),
+            names,
+            0,
+            False,
+        )
+        if not ok or not name:
+            return
+        filename, _ = QFileDialog.getSaveFileName(
+            self,
+            T(self.lang, "TemplateExportTitle"),
+            name + ".csgtemplate.json",
+            "Templates (*.csgtemplate.json)",
+        )
+        if not filename:
+            return
+        template = self.custom_templates.get(name)
+        if not template:
+            return
+        try:
+            export_template(template, Path(filename))
+        except Exception as exc:
+            self.show_error(str(exc))
 
     def dragEnterEvent(self, event) -> None:  # type: ignore[override]
         if event.mimeData().hasUrls():
@@ -394,6 +951,8 @@ class MainWindow(QMainWindow):
             and self.range_spin.value() > 0
             and (0.0 <= self.gap_spin.value() <= MAX_GAP_SEC)
         )
+        if self.current_mode == "custom":
+            ok = ok and self.active_preset is not None
         self.generate_btn.setEnabled(ok and (self.worker is None))
         self.cancel_btn.setEnabled(self.worker is not None)
         self.open_out_btn.setEnabled(
@@ -457,11 +1016,37 @@ class MainWindow(QMainWindow):
         gap_seconds = float(self.gap_spin.value())
         pitched = self.opt_pitched.isChecked()
         dump_samples = self.opt_dump.isChecked()
-        randomize = self.opt_random.isChecked()
+        mode = self.current_mode
+        randomize = mode == "random"
         normalize = self.opt_normalize.isChecked()
         slicex_markers = self.opt_slicex_markers.isChecked()
         start_note_index = self.note_combo.currentIndex()
         start_octave = int(self.octave_combo.currentText())
+
+        custom_sequence: list[Path] | None = None
+        if mode == "custom":
+            resolved = self.resolve_current_preset(report=True)
+            if not resolved:
+                return
+            result, _warnings = resolved
+            custom_sequence = [Path(p) for p in result.sequence]
+            if not custom_sequence:
+                self.show_error(T(self.lang, "CustomSequenceEmpty"))
+                return
+            semitones = len(custom_sequence)
+            if (
+                self.active_preset
+                and self.active_preset.length_policy == "truncate"
+                and semitones != int(self.range_spin.value())
+            ):
+                self.append_log(
+                    T(
+                        self.lang,
+                        "TruncateWarning",
+                        requested=int(self.range_spin.value()),
+                        actual=semitones,
+                    )
+                )
 
         self.log.clear()
         self.progress.setValue(0)
@@ -478,6 +1063,8 @@ class MainWindow(QMainWindow):
             normalize,
             slicex_markers,
             self.lang,
+            mode=mode,
+            custom_sequence=custom_sequence,
         )
         self.worker.progress.connect(self.progress.setValue)
         self.worker.log.connect(self.append_log)

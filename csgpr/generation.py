@@ -46,6 +46,9 @@ class GenerateWorker(QThread):
         normalize: bool,
         slicex_markers: bool,
         lang: str,
+        *,
+        mode: str = "normal",
+        custom_sequence: Sequence[Path] | None = None,
         parent=None,
     ) -> None:
         super().__init__(parent)
@@ -60,6 +63,8 @@ class GenerateWorker(QThread):
         self.normalize = normalize
         self.slicex_markers = slicex_markers
         self.lang = lang
+        self.mode = mode
+        self.custom_sequence = [Path(p) for p in custom_sequence or []]
         self._cancel = False
 
     def request_cancel(self) -> None:
@@ -74,22 +79,46 @@ class GenerateWorker(QThread):
                 raise FileNotFoundError(T(self.lang, "Folder not found."))
 
             file_count = 0
-            while (self.sample_path / f"{file_count + 1}.wav").exists():
-                file_count += 1
-
-            if file_count == 0:
-                raise FileNotFoundError(
-                    T(self.lang, "No sequential samples found (1.wav, 2.wav, ...).")
+            if self.mode == "custom":
+                if not self.custom_sequence:
+                    raise FileNotFoundError(T(self.lang, "Custom preset is empty."))
+                missing = [p for p in self.custom_sequence if not Path(p).exists()]
+                if missing:
+                    raise FileNotFoundError(
+                        T(
+                            self.lang,
+                            "Missing sample for custom preset: {p}",
+                            p=missing[0],
+                        )
+                    )
+                file_count = len({p.resolve() for p in self.custom_sequence})
+                self._emit(
+                    T(
+                        self.lang,
+                        "Custom order will use {n} file(s).",
+                        n=len(self.custom_sequence),
+                    )
                 )
+            else:
+                while (self.sample_path / f"{file_count + 1}.wav").exists():
+                    file_count += 1
 
-            self._emit(
-                T(
-                    self.lang,
-                    "Found {n} sample(s) (1.wav..{m}.wav).",
-                    n=file_count,
-                    m=file_count,
+                if file_count == 0:
+                    raise FileNotFoundError(
+                        T(
+                            self.lang,
+                            "No sequential samples found (1.wav, 2.wav, ...).",
+                        )
+                    )
+
+                self._emit(
+                    T(
+                        self.lang,
+                        "Found {n} sample(s) (1.wav..{m}.wav).",
+                        n=file_count,
+                        m=file_count,
+                    )
                 )
-            )
             self._emit(
                 T(
                     self.lang,
@@ -118,17 +147,24 @@ class GenerateWorker(QThread):
             gap_samples = int(gap.get_number_of_samples())
             current_offset = 0
 
+            sequence = list(self.custom_sequence) if self.mode == "custom" else None
+
             for i in range(self.semitones):
                 if self._cancel:
                     self.cancelled.emit(T(self.lang, "Cancelled by user."))
                     return
 
-                idx = (
-                    random.randint(1, file_count)
-                    if self.randomize
-                    else (i % file_count) + 1
-                )
-                file_path = self.sample_path / f"{idx}.wav"
+                if self.mode == "custom":
+                    if sequence is None or i >= len(sequence):
+                        raise RuntimeError("Custom sequence shorter than semitone count")
+                    file_path = sequence[i]
+                else:
+                    idx = (
+                        random.randint(1, file_count)
+                        if self.randomize
+                        else (i % file_count) + 1
+                    )
+                    file_path = self.sample_path / f"{idx}.wav"
                 self._emit(
                     T(
                         self.lang,

@@ -42,6 +42,7 @@ No more manual pitch editing, no more pain — just clean, playable chromatics i
 * **Multi-language support** — includes more than ten languages
 * **Drag and Drop** — quickly load a folder of samples
 * **Automatic validation** — detects missing or invalid `.wav` files
+* **Custom order presets & templates** — arrange tagged vowels symbolically with import/export
 * **Peak normalization** — optional pre-step to level audio before processing
 * **“Ask before overwrite”** — prevents accidental file replacement
 * **Threaded generation** — background processing without freezing the interface
