@@ -8,64 +8,53 @@ PaletteKey = Tuple[str, str]
 Palette = Dict[str, str]
 
 
+_BASE_DARK: Palette = dict(
+    bg="#171A24",
+    panel="#1F2430",
+    text="#EAEFFE",
+    sub="#A5AFC8",
+    field="#222735",
+    border="#2F3647",
+    warn="#FFB4A8",
+    muted="#8289A0",
+)
+
+_ACCENTS: dict[str, Palette] = {
+    "blue": dict(
+        accent="#5B8CFF",
+        accent_hover="#769EFF",
+        accent_active="#416FE0",
+        accent_soft="#2B3656",
+        accent_outline="#9FC0FF",
+        on_accent="#F9FBFF",
+    ),
+    "pink": dict(
+        accent="#FF6FAB",
+        accent_hover="#FF8DC0",
+        accent_active="#E55C98",
+        accent_soft="#362A3E",
+        accent_outline="#FFC5E0",
+        on_accent="#FFF9FE",
+    ),
+    "green": dict(
+        accent="#4ED48F",
+        accent_hover="#6FE5A5",
+        accent_active="#3EB877",
+        accent_soft="#253F34",
+        accent_outline="#94EAC4",
+        on_accent="#F5FFF9",
+    ),
+}
+
+
+def _build_palette(accent: str) -> Palette:
+    palette = dict(_BASE_DARK)
+    palette.update(_ACCENTS[accent])
+    return palette
+
+
 PALETTES: dict[PaletteKey, Palette] = {
-    (
-        "dark",
-        "blue",
-    ): dict(
-        bg="#151924",
-        panel="#1E2432",
-        text="#E7ECF8",
-        sub="#A9B4CC",
-        field="#1A1F2B",
-        border="#2B3142",
-        accent="#4C8DF6",
-        accent_hover="#6EA4FF",
-        accent_active="#3C77E1",
-        accent_soft="#263A5F",
-        accent_outline="#9EC0FF",
-        on_accent="#FFFFFF",
-        warn="#FF9B9B",
-        muted="#7C8397",
-    ),
-    (
-        "dark",
-        "pink",
-    ): dict(
-        bg="#1A1620",
-        panel="#231C2B",
-        text="#F6EAF5",
-        sub="#D0A9C8",
-        field="#201827",
-        border="#34293E",
-        accent="#FF5F9E",
-        accent_hover="#FF82B6",
-        accent_active="#E24D89",
-        accent_soft="#3D2940",
-        accent_outline="#FFB5D4",
-        on_accent="#FFFFFF",
-        warn="#FFB6C9",
-        muted="#8F7B8E",
-    ),
-    (
-        "dark",
-        "green",
-    ): dict(
-        bg="#141C1A",
-        panel="#1D2624",
-        text="#E3F4ED",
-        sub="#A3C9BA",
-        field="#18211F",
-        border="#28332F",
-        accent="#4CCD81",
-        accent_hover="#6FE8A1",
-        accent_active="#3BBF72",
-        accent_soft="#2C4336",
-        accent_outline="#8FEBC1",
-        on_accent="#0F1A16",
-        warn="#FFBFA3",
-        muted="#7E928A",
-    ),
+    ("dark", accent): _build_palette(accent) for accent in _ACCENTS
 }
 
 
