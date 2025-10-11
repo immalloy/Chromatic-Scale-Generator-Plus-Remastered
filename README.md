@@ -42,12 +42,26 @@ No more manual pitch editing, no more pain — just clean, playable chromatics i
 * **Multi-language support** — includes more than ten languages
 * **Drag and Drop** — quickly load a folder of samples
 * **Automatic validation** — detects missing or invalid `.wav` files
+* **Custom order presets & templates** — arrange tagged vowels symbolically with import/export
 * **Peak normalization** — optional pre-step to level audio before processing
 * **“Ask before overwrite”** — prevents accidental file replacement
 * **Threaded generation** — background processing without freezing the interface
 * **Open Output Folder** — instantly access your generated files
 * **Credits window** — includes contributors and Discord community link
 * **Unified dialogs** — consistent notifications for information, errors, and warnings
+
+---
+
+## 🎚 Example Custom Order Files
+
+Need a starting point for the new preset workflow? Import the ready-made files inside [`assets/examples`](assets/examples/):
+
+- `standard_cycle.csgorder.json` – the classic A→AY vowel loop
+- `bright_swells.csgorder.json` – a brighter lead-focused ordering
+- `cycle_36_template.csgtemplate.json` – restores a 36-note setup using Standard Cycle
+- `random_bounce_template.csgtemplate.json` – seeded random selection with a 24-note range
+
+Open **Configuration → Custom Order**, choose **Import** (or **Template → Import Template**), and pick one of these JSON files to load it instantly.
 
 ---
 

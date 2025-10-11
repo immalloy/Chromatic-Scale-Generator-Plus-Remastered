@@ -1,0 +1,25 @@
+{
+  "name": "Random Bounce",
+  "preset": {
+    "name": "Bright Swells",
+    "symbols": ["A", "E", "I", "O", "U", "AY"],
+    "order": ["AY", "E", "I", "AY", "E", "I", "AY"],
+    "policy": {"mode": "random", "seed": 128},
+    "length_policy": "pad",
+    "on_missing_symbol": "skip",
+    "version": 1
+  },
+  "settings": {
+    "note_index": 2,
+    "octave": 4,
+    "semitones": 24,
+    "gap": 0.18,
+    "pitched": true,
+    "dump": true,
+    "normalize": false,
+    "slicex": false,
+    "mode": "custom",
+    "preset": "Bright Swells"
+  },
+  "version": 1
+}

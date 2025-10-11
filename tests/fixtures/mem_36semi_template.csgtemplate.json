@@ -1,0 +1,25 @@
+{
+  "name": "MEM 36",
+  "preset": {
+    "name": "Verse 2 Cycle",
+    "symbols": ["A", "E", "I", "O", "U", "AY"],
+    "order": ["A", "E", "I", "O", "U", "AY"],
+    "policy": {"mode": "cycle", "seed": 5},
+    "length_policy": "pad",
+    "on_missing_symbol": "skip",
+    "version": 1
+  },
+  "settings": {
+    "note_index": 0,
+    "octave": 3,
+    "semitones": 36,
+    "gap": 0.3,
+    "pitched": true,
+    "dump": false,
+    "normalize": true,
+    "slicex": true,
+    "mode": "custom",
+    "preset": "Verse 2 Cycle"
+  },
+  "version": 1
+}
