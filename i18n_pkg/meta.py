@@ -187,7 +187,7 @@ BASE_STRINGS: Dict[str, str] = {
     "Saved: {path}": "Saved: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "Dumped {n} pitched sample(s) to: {dir}",
     "SplashTitle": "Chromatic Scale Generator Plus Remastered",
-    "SplashSubtitle": "Loading the oscillators…",
+    "SplashSubtitle": "",
     "SplashCredits": "Credits: @ChillSpaceIRL • @nullfreq_ • Malloy",
 }
 

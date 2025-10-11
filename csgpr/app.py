@@ -210,24 +210,25 @@ def _build_splash_pixmap(
     painter.drawText(title_rect, title_flags, title)
     title_height = painter.fontMetrics().boundingRect(title_rect, title_flags, title).height()
 
-    subtitle_top = title_rect.top() + title_height + 12
-    subtitle_top = min(subtitle_top, panel_rect.bottom() - 28)
+    if subtitle.strip():
+        subtitle_top = title_rect.top() + title_height + 12
+        subtitle_top = min(subtitle_top, panel_rect.bottom() - 28)
 
-    subtitle_font = QFont()
-    subtitle_font.setPointSizeF(size.height() * 0.024)
-    painter.setFont(subtitle_font)
-    painter.setPen(QColor("#D8D5FF"))
-    subtitle_rect = QRect(
-        text_left,
-        subtitle_top,
-        text_width,
-        max(panel_rect.bottom() - subtitle_top - 28, 0),
-    )
-    painter.drawText(
-        subtitle_rect,
-        Qt.AlignLeft | Qt.AlignTop | Qt.TextWordWrap,
-        subtitle,
-    )
+        subtitle_font = QFont()
+        subtitle_font.setPointSizeF(size.height() * 0.024)
+        painter.setFont(subtitle_font)
+        painter.setPen(QColor("#D8D5FF"))
+        subtitle_rect = QRect(
+            text_left,
+            subtitle_top,
+            text_width,
+            max(panel_rect.bottom() - subtitle_top - 28, 0),
+        )
+        painter.drawText(
+            subtitle_rect,
+            Qt.AlignLeft | Qt.AlignTop | Qt.TextWordWrap,
+            subtitle,
+        )
 
     credit_width = int(size.width() * 0.26)
     credits_panel_rect = QRect(
