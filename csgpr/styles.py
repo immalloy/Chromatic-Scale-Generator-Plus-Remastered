@@ -9,40 +9,40 @@ Palette = Dict[str, str]
 
 
 _BASE_DARK: Palette = dict(
-    bg="#171A24",
-    panel="#1F2430",
-    text="#EAEFFE",
-    sub="#A5AFC8",
-    field="#222735",
-    border="#2F3647",
-    warn="#FFB4A8",
-    muted="#8289A0",
+    bg="#121418",
+    panel="#1A1D24",
+    text="#E5E9F2",
+    sub="#B6BDCF",
+    field="#202430",
+    border="#2A303D",
+    warn="#FFB3B3",
+    muted="#8C94A5",
 )
 
 _ACCENTS: dict[str, Palette] = {
     "blue": dict(
-        accent="#5B8CFF",
-        accent_hover="#769EFF",
-        accent_active="#416FE0",
-        accent_soft="#2B3656",
-        accent_outline="#9FC0FF",
-        on_accent="#F9FBFF",
+        accent="#2D7CF3",
+        accent_hover="#4D90FE",
+        accent_active="#1F5FCC",
+        accent_soft="#2A364F",
+        accent_outline="#7EB0FF",
+        on_accent="#F7FAFF",
     ),
     "pink": dict(
-        accent="#FF6FAB",
-        accent_hover="#FF8DC0",
-        accent_active="#E55C98",
-        accent_soft="#362A3E",
-        accent_outline="#FFC5E0",
-        on_accent="#FFF9FE",
+        accent="#FF5AA1",
+        accent_hover="#FF7FBF",
+        accent_active="#E44B90",
+        accent_soft="#3A2635",
+        accent_outline="#FF9BC5",
+        on_accent="#FFF5FA",
     ),
     "green": dict(
-        accent="#4ED48F",
-        accent_hover="#6FE5A5",
-        accent_active="#3EB877",
-        accent_soft="#253F34",
-        accent_outline="#94EAC4",
-        on_accent="#F5FFF9",
+        accent="#42C67D",
+        accent_hover="#5FDA95",
+        accent_active="#32A566",
+        accent_soft="#243830",
+        accent_outline="#8ADFB4",
+        on_accent="#F4FFF9",
     ),
 }
 
@@ -69,7 +69,7 @@ def build_stylesheet(mode: str, accent: str) -> str:
     if key not in PALETTES:
         key = ("dark", "pink")
     palette = PALETTES[key]
-    highlight_text = palette["text"]
+    highlight_text = palette["on_accent"]
     arrow_color = _encode_color(palette["accent"])
     arrow_disabled = _encode_color(palette["border"])
     down_arrow = (
@@ -119,7 +119,7 @@ def build_stylesheet(mode: str, accent: str) -> str:
     return f"""
         QMainWindow {{ background: {palette['bg']}; }}
         QWidget {{
-            background: {palette['bg']};
+            background-color: {palette['bg']};
             color: {palette['text']};
         }}
         QGroupBox {{
@@ -147,7 +147,7 @@ def build_stylesheet(mode: str, accent: str) -> str:
             border-radius: 8px;
             padding: 6px;
             color: {palette['text']};
-            selection-background-color: {palette['accent_soft']};
+            selection-background-color: {palette['accent_hover']};
             selection-color: {highlight_text};
         }}
         QLineEdit::placeholder, QTextEdit::placeholder, QPlainTextEdit::placeholder {{
@@ -167,7 +167,7 @@ def build_stylesheet(mode: str, accent: str) -> str:
             background: {palette['panel']};
             border: 1px solid {palette['border']};
             color: {palette['text']};
-            selection-background-color: {palette['accent_soft']};
+            selection-background-color: {palette['accent_hover']};
             selection-color: {highlight_text};
         }}
         QComboBox::drop-down {{
@@ -393,6 +393,6 @@ def build_stylesheet(mode: str, accent: str) -> str:
             font-weight: 600;
         }}
         #LinkButton:hover {{ color: {palette['accent_hover']}; }}
-        #LinkButton:pressed {{ color: {palette['accent_active']}; opacity: 0.9; }}
+        #LinkButton:pressed {{ color: {palette['accent_active']}; }}
         #LinkButton:disabled {{ color: {palette['muted']}; }}
     """
