@@ -29,6 +29,7 @@ STRINGS = {
     "Credits": "Благодарности",
     "Wiki": "Вики",
     "Tutorial": "Учебник",
+    "Settings": "Настройки",
     "&Help": "&Справка",
 
     "Folder not found.": "Папка не найдена.",

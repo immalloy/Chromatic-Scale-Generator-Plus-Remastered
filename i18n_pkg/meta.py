@@ -159,6 +159,7 @@ BASE_STRINGS: Dict[str, str] = {
     "Credits": "Credits",
     "Wiki": "Wiki",
     "Tutorial": "Tutorial",
+    "Settings": "Settings",
     "&Help": "&Help",
     "Folder not found.": "Folder not found.",
     "Need at least 1.wav in this folder.": "Need at least 1.wav in this folder.",

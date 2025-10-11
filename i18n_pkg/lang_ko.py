@@ -29,6 +29,7 @@ STRINGS = {
     "Credits": "크레딧",
     "Wiki": "위키",
     "Tutorial": "튜토리얼",
+    "Settings": "설정",
     "&Help": "&도움말",
 
     "Folder not found.": "폴더를 찾을 수 없습니다.",

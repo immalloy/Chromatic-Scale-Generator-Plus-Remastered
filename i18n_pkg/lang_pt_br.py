@@ -28,6 +28,7 @@ STRINGS = {
     "Credits": "Créditos",
     "Wiki": "Wiki",
     "Tutorial": "Tutorial",
+    "Settings": "Configurações",
     "&Help": "&Ajuda",
 
     "Folder not found.": "Pasta não encontrada.",

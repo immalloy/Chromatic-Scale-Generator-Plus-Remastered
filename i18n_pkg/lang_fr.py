@@ -29,6 +29,7 @@ STRINGS = {
     "Credits": "Credits",
     "Wiki": "Wiki",
     "Tutorial": "Tutoriel",
+    "Settings": "Paramètres",
     "&Help": "&Aide",
 
     "Folder not found.": "Dossier introuvable.",

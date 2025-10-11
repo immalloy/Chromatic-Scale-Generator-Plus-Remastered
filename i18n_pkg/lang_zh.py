@@ -29,6 +29,7 @@ STRINGS = {
     "Credits": "致谢",
     "Wiki": "Wiki",
     "Tutorial": "教程",
+    "Settings": "设置",
     "&Help": "&帮助",
 
     "Folder not found.": "未找到文件夹。",
