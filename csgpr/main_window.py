@@ -1,6 +1,23 @@
 from __future__ import annotations
 
-"""Primary Qt window for the Chromatic Scale Generator PLUS!"""
+"""Primary Qt window for the Chromatic Scale Generator PLUS!
+
+UI layout overview
+===================
+* Header: branded title row with quick access actions (settings, wiki,
+  tutorial, credits) and a descriptive tagline to orient new users.
+* Main content splitter:
+  - Sample setup card on the left for folder selection, musical range
+    configuration, and processing toggles grouped into logical sections.
+  - Generation status card on the right containing the run summary,
+    progress indicator, log console, and action rows.
+* Footer: project attribution string that stays visible regardless of
+  window size for accessibility.
+
+The redesign embraces a PC-first responsive layout, clear visual
+hierarchy, and accessible affordances while retaining the app's core
+functionality.
+"""
 
 import os
 import subprocess
@@ -14,6 +31,7 @@ from PySide6.QtWidgets import (
     QDoubleSpinBox,
     QFileDialog,
     QFormLayout,
+    QFrame,
     QGroupBox,
     QHBoxLayout,
     QLabel,
@@ -22,6 +40,7 @@ from PySide6.QtWidgets import (
     QMessageBox,
     QProgressBar,
     QPushButton,
+    QSplitter,
     QSpinBox,
     QStatusBar,
     QTextEdit,
@@ -53,8 +72,25 @@ class MainWindow(QMainWindow):
         self.mode = "dark"
         self.accent = "pink"
 
+        self._init_window()
+        self._build_ui()
+        self._connect_signals()
+
+        self.build_menus()
+
+        self.setStatusBar(QStatusBar())
+        self.apply_theme()
+
+        self.worker: GenerateWorker | None = None
+        self.last_output_path: Path | None = None
+
+        self.setAcceptDrops(True)
+        self.refresh_validation()
+        self.refresh_button_state()
+
+    def _init_window(self) -> None:
         self.setWindowTitle(APP_TITLE)
-        self.setMinimumSize(1040, 680)
+        self.setMinimumSize(1200, 760)
 
         try:
             if os.path.exists(APP_ICON_PATH):
@@ -62,24 +98,135 @@ class MainWindow(QMainWindow):
         except Exception:  # pragma: no cover - environment specific
             pass
 
+    def _build_ui(self) -> None:
         central = QWidget()
         self.setCentralWidget(central)
 
-        self.cfg_group = QGroupBox(T(self.lang, "Configuration"))
+        outer = QVBoxLayout(central)
+        outer.setContentsMargins(24, 24, 24, 24)
+        outer.setSpacing(24)
+
+        header = self._build_header()
+        outer.addWidget(header)
+
+        splitter = QSplitter()
+        splitter.setObjectName("ContentSplitter")
+        splitter.setChildrenCollapsible(False)
+
+        config_panel = self._build_configuration_panel()
+        status_panel = self._build_generation_panel()
+        splitter.addWidget(config_panel)
+        splitter.addWidget(status_panel)
+        splitter.setStretchFactor(0, 3)
+        splitter.setStretchFactor(1, 4)
+
+        outer.addWidget(splitter, 1)
+
+        footer = self._build_footer()
+        outer.addWidget(footer)
+
+    def _build_header(self) -> QWidget:
+        container = QFrame()
+        container.setObjectName("HeaderFrame")
+
+        layout = QVBoxLayout(container)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(8)
+
+        top_row = QHBoxLayout()
+        top_row.setSpacing(12)
+
+        self.hero_title_label = QLabel(T(self.lang, "WorkspaceHeadline"))
+        self.hero_title_label.setObjectName("HeroTitle")
+        self.hero_title_label.setAccessibleDescription(
+            T(self.lang, "WorkspaceHeadline")
+        )
+        top_row.addWidget(self.hero_title_label, 1)
+
+        nav_row = QHBoxLayout()
+        nav_row.setSpacing(8)
+
+        self.settings_btn = QPushButton(T(self.lang, "Settings"))
+        self.settings_btn.setObjectName("SettingsButton")
+
+        self.wiki_btn = QPushButton(T(self.lang, "Wiki"))
+        self.wiki_btn.setObjectName("LinkButton")
+
+        self.tutorial_btn = QPushButton(T(self.lang, "Tutorial"))
+        self.tutorial_btn.setObjectName("LinkButton")
+
+        self.credits_btn = QPushButton(T(self.lang, "Credits"))
+        self.credits_btn.setObjectName("LinkButton")
+
+        for button in (self.settings_btn, self.wiki_btn, self.tutorial_btn, self.credits_btn):
+            button.setFlat(True)
+            nav_row.addWidget(button)
+
+        top_row.addLayout(nav_row, 0)
+        layout.addLayout(top_row)
+
+        self.hero_subtitle_label = QLabel(T(self.lang, "WorkspaceTagline"))
+        self.hero_subtitle_label.setObjectName("HeroSubtitle")
+        self.hero_subtitle_label.setWordWrap(True)
+        layout.addWidget(self.hero_subtitle_label)
+
+        divider = QFrame()
+        divider.setFrameShape(QFrame.HLine)
+        divider.setFrameShadow(QFrame.Sunken)
+        layout.addWidget(divider)
+
+        return container
+
+    def _build_configuration_panel(self) -> QWidget:
+        panel = QFrame()
+        panel.setObjectName("ConfigurationPanel")
+
+        layout = QVBoxLayout(panel)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(18)
+
+        self.cfg_group = QGroupBox()
+        self.cfg_group.setObjectName("ConfigCard")
         cfg_layout = QVBoxLayout(self.cfg_group)
         cfg_layout.setSpacing(16)
 
+        self.config_title_label = QLabel(T(self.lang, "SampleSetup"))
+        self.config_title_label.setObjectName("CardTitle")
+        cfg_layout.addWidget(self.config_title_label)
+
+        self.config_subtitle_label = QLabel(T(self.lang, "SampleSetupDescription"))
+        self.config_subtitle_label.setObjectName("CardSubtitle")
+        self.config_subtitle_label.setWordWrap(True)
+        cfg_layout.addWidget(self.config_subtitle_label)
+
         self.path_edit = QLineEdit()
+        self.path_edit.setClearButtonEnabled(True)
         self.path_edit.setPlaceholderText(
             T(self.lang, "Select a folder containing 1.wav, 2.wav, ...")
         )
+
         self.browse_btn = QPushButton(T(self.lang, "Browse…"))
-        self.browse_btn.clicked.connect(self.choose_folder)
 
         self.warn_label = QLabel("")
         self.warn_label.setObjectName("WarnLabel")
         self.warn_label.setVisible(False)
         self.warn_label.setWordWrap(True)
+
+        self.sample_folder_label = QLabel(T(self.lang, "Sample folder"))
+        self.sample_folder_label.setObjectName("SectionLabel")
+
+        folder_row = QHBoxLayout()
+        folder_row.setSpacing(12)
+        folder_row.addWidget(self.path_edit, 1)
+        folder_row.addWidget(self.browse_btn, 0)
+
+        cfg_layout.addWidget(self.sample_folder_label)
+        cfg_layout.addLayout(folder_row)
+        cfg_layout.addWidget(self.warn_label)
+
+        self.timing_section_label = QLabel(T(self.lang, "TimingAndTuning"))
+        self.timing_section_label.setObjectName("SectionLabel")
+        cfg_layout.addWidget(self.timing_section_label)
 
         self.note_combo = QComboBox()
         self.note_combo.addItems(NOTE_NAMES)
@@ -100,25 +247,6 @@ class MainWindow(QMainWindow):
         self.gap_spin.setSingleStep(0.05)
         self.gap_spin.setValue(0.30)
 
-        self.opt_pitched = QCheckBox(T(self.lang, "Apply pitch transformation"))
-        self.opt_pitched.setChecked(True)
-        self.opt_dump = QCheckBox(T(self.lang, "Dump individual pitched samples"))
-        self.opt_random = QCheckBox(T(self.lang, "Randomize sample selection"))
-        self.opt_normalize = QCheckBox(
-            T(self.lang, "Peak normalize each sample (pre-pitch)")
-        )
-        self.opt_slicex_markers = QCheckBox(
-            T(self.lang, "Embed FL Studio Slicex slice markers")
-        )
-
-        self.sample_folder_label = QLabel(T(self.lang, "Sample folder"))
-        folder_row = QHBoxLayout()
-        folder_row.addWidget(self.path_edit, 1)
-        folder_row.addWidget(self.browse_btn, 0)
-        cfg_layout.addWidget(self.sample_folder_label)
-        cfg_layout.addLayout(folder_row)
-        cfg_layout.addWidget(self.warn_label)
-
         form = QFormLayout()
         form.setFieldGrowthPolicy(QFormLayout.ExpandingFieldsGrow)
 
@@ -136,44 +264,87 @@ class MainWindow(QMainWindow):
 
         cfg_layout.addLayout(form)
 
+        self.processing_section_label = QLabel(T(self.lang, "ProcessingOptions"))
+        self.processing_section_label.setObjectName("SectionLabel")
+        cfg_layout.addWidget(self.processing_section_label)
+
         toggles = QVBoxLayout()
         toggles.setSpacing(6)
+
+        self.opt_pitched = QCheckBox(T(self.lang, "Apply pitch transformation"))
+        self.opt_pitched.setChecked(True)
         toggles.addWidget(self.opt_pitched)
+
+        self.opt_dump = QCheckBox(T(self.lang, "Dump individual pitched samples"))
         toggles.addWidget(self.opt_dump)
+
+        self.opt_random = QCheckBox(T(self.lang, "Randomize sample selection"))
         toggles.addWidget(self.opt_random)
+
+        self.opt_normalize = QCheckBox(
+            T(self.lang, "Peak normalize each sample (pre-pitch)")
+        )
         toggles.addWidget(self.opt_normalize)
+
+        self.opt_slicex_markers = QCheckBox(
+            T(self.lang, "Embed FL Studio Slicex slice markers")
+        )
         toggles.addWidget(self.opt_slicex_markers)
+
         cfg_layout.addLayout(toggles)
         cfg_layout.addStretch(1)
 
+        layout.addWidget(self.cfg_group)
 
-        self.run_group = QGroupBox(T(self.lang, "Run"))
+        return panel
+
+    def _build_generation_panel(self) -> QWidget:
+        panel = QFrame()
+        panel.setObjectName("GenerationPanel")
+
+        layout = QVBoxLayout(panel)
+        layout.setContentsMargins(24, 24, 24, 24)
+        layout.setSpacing(18)
+
+        self.run_group = QGroupBox()
+        self.run_group.setObjectName("RunCard")
         run_layout = QVBoxLayout(self.run_group)
+        run_layout.setSpacing(16)
 
-        self.generate_btn = QPushButton(T(self.lang, "Generate Chromatic"))
-        self.generate_btn.setEnabled(False)
-        self.cancel_btn = QPushButton(T(self.lang, "Cancel"))
-        self.cancel_btn.setEnabled(False)
-        self.open_out_btn = QPushButton(T(self.lang, "Open Output Folder"))
-        self.open_out_btn.setEnabled(False)
+        self.status_title_label = QLabel(T(self.lang, "GenerationStatus"))
+        self.status_title_label.setObjectName("CardTitle")
+        run_layout.addWidget(self.status_title_label)
+
+        self.summary_label = QLabel(T(self.lang, "SummaryWaiting"))
+        self.summary_label.setObjectName("SummaryLabel")
+        self.summary_label.setWordWrap(True)
+        run_layout.addWidget(self.summary_label)
 
         self.progress = QProgressBar()
         self.progress.setRange(0, 100)
         self.progress.setValue(0)
+        run_layout.addWidget(self.progress)
 
         self.log = QTextEdit()
         self.log.setReadOnly(True)
         self.log.setPlaceholderText(T(self.lang, "Logs will appear here…"))
-
-        run_layout.addWidget(self.progress)
         run_layout.addWidget(self.log, 1)
+
+        self.generate_btn = QPushButton(T(self.lang, "Generate Chromatic"))
+        self.generate_btn.setEnabled(False)
+
+        self.cancel_btn = QPushButton(T(self.lang, "Cancel"))
+        self.cancel_btn.setEnabled(False)
 
         primary_actions = QHBoxLayout()
         primary_actions.setSpacing(12)
         primary_actions.addStretch(1)
-        primary_actions.addWidget(self.generate_btn)
         primary_actions.addWidget(self.cancel_btn)
+        primary_actions.addWidget(self.generate_btn)
         run_layout.addLayout(primary_actions)
+
+        self.open_out_btn = QPushButton(T(self.lang, "Open Output Folder"))
+        self.open_out_btn.setEnabled(False)
 
         secondary_actions = QHBoxLayout()
         secondary_actions.setSpacing(12)
@@ -181,45 +352,49 @@ class MainWindow(QMainWindow):
         secondary_actions.addWidget(self.open_out_btn)
         run_layout.addLayout(secondary_actions)
 
-        footer_row = QHBoxLayout()
-        self.footer = QLabel(T(self.lang, "Footer"))
-        self.footer.setObjectName("Footer")
-        self.wiki_btn = QPushButton(T(self.lang, "Wiki"))
-        self.wiki_btn.setObjectName("LinkButton")
-        self.tutorial_btn = QPushButton(T(self.lang, "Tutorial"))
-        self.tutorial_btn.setObjectName("LinkButton")
-        self.credits_btn = QPushButton(T(self.lang, "Credits"))
-        self.credits_btn.setObjectName("LinkButton")
-        footer_row.addWidget(self.footer, 1)
-        footer_row.addStretch(1)
-        footer_row.addWidget(self.wiki_btn, 0)
-        footer_row.addWidget(self.tutorial_btn, 0)
-        footer_row.addWidget(self.credits_btn, 0)
+        layout.addWidget(self.run_group, 1)
 
-        outer = QVBoxLayout(central)
-        outer.addWidget(self.cfg_group)
-        outer.addWidget(self.run_group, 1)
-        outer.addLayout(footer_row)
+        return panel
 
-        self.build_menus()
+    def _build_footer(self) -> QWidget:
+        footer = QFrame()
+        footer.setObjectName("FooterFrame")
 
-        self.setStatusBar(QStatusBar())
-        self.apply_theme()
+        layout = QHBoxLayout(footer)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(12)
 
+        self.footer_label = QLabel(T(self.lang, "Footer"))
+        self.footer_label.setObjectName("Footer")
+        self.footer_label.setWordWrap(True)
+        layout.addWidget(self.footer_label)
+
+        return footer
+
+    def _connect_signals(self) -> None:
+        self.browse_btn.clicked.connect(self.choose_folder)
         self.path_edit.textChanged.connect(self.refresh_validation)
+
+        self.range_spin.valueChanged.connect(self._on_numeric_changed)
+        self.gap_spin.valueChanged.connect(self._on_numeric_changed)
+        self.note_combo.currentIndexChanged.connect(self._on_selection_changed)
+        self.octave_combo.currentIndexChanged.connect(self._on_selection_changed)
+
         self.generate_btn.clicked.connect(self.start_generation)
         self.cancel_btn.clicked.connect(self.cancel_generation)
         self.open_out_btn.clicked.connect(self.open_output_folder_clicked)
+
+        self.settings_btn.clicked.connect(self.show_settings)
         self.wiki_btn.clicked.connect(self.open_wiki)
         self.tutorial_btn.clicked.connect(self.open_tutorial)
         self.credits_btn.clicked.connect(self.show_credits)
 
-        self.worker: GenerateWorker | None = None
-        self.last_output_path: Path | None = None
-
-        self.setAcceptDrops(True)
-        self.refresh_validation()
+    def _on_numeric_changed(self, *_: object) -> None:
         self.refresh_button_state()
+        self.update_summary()
+
+    def _on_selection_changed(self, *_: object) -> None:
+        self.update_summary()
 
     def apply_theme(self) -> None:
         self.setStyleSheet(build_stylesheet(self.mode, self.accent))
@@ -227,6 +402,22 @@ class MainWindow(QMainWindow):
     def build_menus(self) -> None:
         bar = self.menuBar()
         bar.clear()
+
+        file_menu = bar.addMenu(T(self.lang, "&File"))
+
+        act_open_folder = QAction(T(self.lang, "Open Sample Folder…"), self)
+        act_open_folder.triggered.connect(self.choose_folder)
+        file_menu.addAction(act_open_folder)
+
+        reveal_output = QAction(T(self.lang, "Open Output Folder"), self)
+        reveal_output.triggered.connect(self.open_output_folder_clicked)
+        file_menu.addAction(reveal_output)
+
+        file_menu.addSeparator()
+
+        settings_action = QAction(T(self.lang, "Settings"), self)
+        settings_action.triggered.connect(self.show_settings)
+        file_menu.addAction(settings_action)
 
         help_menu = bar.addMenu(T(self.lang, "&Help"))
         act_wiki = QAction(T(self.lang, "Wiki"), self)
@@ -243,19 +434,24 @@ class MainWindow(QMainWindow):
         act_credits.triggered.connect(self.show_credits)
         help_menu.addAction(act_credits)
 
-        settings_action = QAction(T(self.lang, "Settings"), self)
-        settings_action.triggered.connect(self.show_settings)
-        bar.addAction(settings_action)
-
     def retranslate_all(self) -> None:
         self.setWindowTitle(APP_TITLE)
+        self.hero_title_label.setText(T(self.lang, "WorkspaceHeadline"))
+        self.hero_title_label.setAccessibleDescription(
+            T(self.lang, "WorkspaceHeadline")
+        )
+        self.hero_subtitle_label.setText(T(self.lang, "WorkspaceTagline"))
+
         self.cfg_group.setTitle(T(self.lang, "Configuration"))
-        self.run_group.setTitle(T(self.lang, "Run"))
+        self.config_title_label.setText(T(self.lang, "SampleSetup"))
+        self.config_subtitle_label.setText(T(self.lang, "SampleSetupDescription"))
         self.sample_folder_label.setText(T(self.lang, "Sample folder"))
+        self.timing_section_label.setText(T(self.lang, "TimingAndTuning"))
         self.starting_note_label.setText(T(self.lang, "Starting note"))
         self.starting_octave_label.setText(T(self.lang, "Starting octave"))
         self.semitone_range_label.setText(T(self.lang, "Semitone range"))
         self.gap_label.setText(T(self.lang, "Gap (seconds)"))
+        self.processing_section_label.setText(T(self.lang, "ProcessingOptions"))
         self.browse_btn.setText(T(self.lang, "Browse…"))
         self.path_edit.setPlaceholderText(
             T(self.lang, "Select a folder containing 1.wav, 2.wav, ...")
@@ -269,17 +465,26 @@ class MainWindow(QMainWindow):
         self.opt_slicex_markers.setText(
             T(self.lang, "Embed FL Studio Slicex slice markers")
         )
-        self.generate_btn.setText(T(self.lang, "Generate Chromatic"))
-        self.cancel_btn.setText(T(self.lang, "Cancel"))
-        self.open_out_btn.setText(T(self.lang, "Open Output Folder"))
+        self.settings_btn.setText(T(self.lang, "Settings"))
         self.wiki_btn.setText(T(self.lang, "Wiki"))
         self.tutorial_btn.setText(T(self.lang, "Tutorial"))
         self.credits_btn.setText(T(self.lang, "Credits"))
-        self.footer.setText(T(self.lang, "Footer"))
+        self.status_title_label.setText(T(self.lang, "GenerationStatus"))
+        self.generate_btn.setText(T(self.lang, "Generate Chromatic"))
+        self.cancel_btn.setText(T(self.lang, "Cancel"))
+        self.open_out_btn.setText(T(self.lang, "Open Output Folder"))
+        self.footer_label.setText(T(self.lang, "Footer"))
+
+        self.path_edit.setAccessibleName(T(self.lang, "Sample folder"))
+        self.note_combo.setAccessibleName(T(self.lang, "Starting note"))
+        self.octave_combo.setAccessibleName(T(self.lang, "Starting octave"))
+        self.range_spin.setAccessibleName(T(self.lang, "Semitone range"))
+        self.gap_spin.setAccessibleName(T(self.lang, "Gap (seconds)"))
 
         self.build_menus()
 
         self.refresh_validation()
+        self.update_summary()
 
     def show_settings(self) -> None:
         dialog = SettingsDialog(
@@ -298,6 +503,35 @@ class MainWindow(QMainWindow):
             if new_lang and new_lang != self.lang:
                 self.lang = new_lang
                 self.retranslate_all()
+
+    def update_summary(self) -> None:
+        if not hasattr(self, "summary_label"):
+            return
+
+        if self.folder_valid():
+            note = self.note_combo.currentText()
+            octave = self.octave_combo.currentText()
+            semitones = self.range_spin.value()
+            gap = self.gap_spin.value()
+            summary = T(
+                self.lang,
+                "SummaryReady",
+                note=note,
+                octave=octave,
+                semitones=semitones,
+                gap=gap,
+            )
+            self._set_summary_state("ready")
+        else:
+            summary = T(self.lang, "SummaryWaiting")
+            self._set_summary_state("idle")
+
+        self.summary_label.setText(summary)
+
+    def _set_summary_state(self, state: str) -> None:
+        self.summary_label.setProperty("state", state)
+        self.summary_label.style().unpolish(self.summary_label)
+        self.summary_label.style().polish(self.summary_label)
 
     def dragEnterEvent(self, event) -> None:  # type: ignore[override]
         if event.mimeData().hasUrls():
@@ -353,6 +587,7 @@ class MainWindow(QMainWindow):
                 else:
                     self.warn_label.setVisible(False)
         self.refresh_button_state()
+        self.update_summary()
 
     def refresh_button_state(self) -> None:
         ok = (
