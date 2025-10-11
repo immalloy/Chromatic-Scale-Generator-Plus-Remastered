@@ -204,9 +204,14 @@ def _build_splash_pixmap(
         text_left,
         panel_rect.top() + 28,
         text_width,
-        int(panel_rect.height() * 0.5),
+        panel_rect.height() - 72,
     )
-    painter.drawText(title_rect, Qt.AlignLeft | Qt.AlignTop | Qt.TextWordWrap, title)
+    title_flags = Qt.AlignLeft | Qt.AlignTop | Qt.TextWordWrap
+    painter.drawText(title_rect, title_flags, title)
+    title_height = painter.fontMetrics().boundingRect(title_rect, title_flags, title).height()
+
+    subtitle_top = title_rect.top() + title_height + 12
+    subtitle_top = min(subtitle_top, panel_rect.bottom() - 28)
 
     subtitle_font = QFont()
     subtitle_font.setPointSizeF(size.height() * 0.024)
@@ -214,9 +219,9 @@ def _build_splash_pixmap(
     painter.setPen(QColor("#D8D5FF"))
     subtitle_rect = QRect(
         text_left,
-        title_rect.bottom() + 10,
+        subtitle_top,
         text_width,
-        panel_rect.bottom() - (title_rect.bottom() + 28),
+        max(panel_rect.bottom() - subtitle_top - 28, 0),
     )
     painter.drawText(
         subtitle_rect,
