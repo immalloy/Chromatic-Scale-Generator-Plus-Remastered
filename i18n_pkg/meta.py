@@ -193,6 +193,8 @@ BASE_STRINGS: Dict[str, str] = {
     "ModeNormal": "Normal",
     "ModeRandom": "Random",
     "ModeCustom": "Custom / Presets",
+    "ConfigTabSettings": "Scale Settings",
+    "ConfigTabCustom": "Custom Order",
     "PresetLabel": "Preset",
     "PresetNew": "New",
     "PresetEdit": "Edit",

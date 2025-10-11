@@ -52,6 +52,19 @@ No more manual pitch editing, no more pain — just clean, playable chromatics i
 
 ---
 
+## 🎚 Example Custom Order Files
+
+Need a starting point for the new preset workflow? Import the ready-made files inside [`assets/examples`](assets/examples/):
+
+- `standard_cycle.csgorder.json` – the classic A→AY vowel loop
+- `bright_swells.csgorder.json` – a brighter lead-focused ordering
+- `cycle_36_template.csgtemplate.json` – restores a 36-note setup using Standard Cycle
+- `random_bounce_template.csgtemplate.json` – seeded random selection with a 24-note range
+
+Open **Configuration → Custom Order**, choose **Import** (or **Template → Import Template**), and pick one of these JSON files to load it instantly.
+
+---
+
 ## Perfect For
 
 * **FNF musicians** creating or refining character voicebanks

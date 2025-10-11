@@ -1,0 +1,25 @@
+{
+  "name": "Cycle 36",
+  "preset": {
+    "name": "Standard Cycle",
+    "symbols": ["A", "E", "I", "O", "U", "AY"],
+    "order": ["A", "E", "I", "O", "U", "AY"],
+    "policy": {"mode": "cycle", "seed": null},
+    "length_policy": "pad",
+    "on_missing_symbol": "skip",
+    "version": 1
+  },
+  "settings": {
+    "note_index": 0,
+    "octave": 3,
+    "semitones": 36,
+    "gap": 0.3,
+    "pitched": true,
+    "dump": false,
+    "normalize": true,
+    "slicex": true,
+    "mode": "custom",
+    "preset": "Standard Cycle"
+  },
+  "version": 1
+}

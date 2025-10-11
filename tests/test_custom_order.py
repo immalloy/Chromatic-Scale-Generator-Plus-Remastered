@@ -147,6 +147,17 @@ def test_import_fixture_files() -> None:
     assert template.preset.order[0] == "A"
 
 
+def test_example_assets_are_loadable() -> None:
+    base = Path("assets/examples")
+    preset = import_preset(base / "standard_cycle.csgorder.json")
+    template = import_template(base / "cycle_36_template.csgtemplate.json")
+    assert preset.order == ["A", "E", "I", "O", "U", "AY"]
+    assert template.preset.policy.mode == "cycle"
+    random_template = import_template(base / "random_bounce_template.csgtemplate.json")
+    assert random_template.preset.policy.mode == "random"
+    assert random_template.preset.policy.seed == 128
+
+
 def test_resolve_error_on_missing_symbol_error(tmp_path: Path) -> None:
     preset = CustomOrderPreset(
         name="Strict",

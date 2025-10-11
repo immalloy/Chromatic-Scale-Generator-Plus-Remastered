@@ -1,0 +1,9 @@
+{
+  "name": "Bright Swells",
+  "symbols": ["A", "E", "I", "O", "U", "AY"],
+  "order": ["AY", "E", "I", "AY", "E", "I", "AY"],
+  "policy": {"mode": "cycle", "seed": null},
+  "length_policy": "pad",
+  "on_missing_symbol": "skip",
+  "version": 1
+}

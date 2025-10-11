@@ -28,6 +28,7 @@ from PySide6.QtWidgets import (
     QPushButton,
     QSpinBox,
     QStatusBar,
+    QTabWidget,
     QTextEdit,
     QVBoxLayout,
     QWidget,
@@ -86,7 +87,27 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(central)
 
         self.cfg_group = QGroupBox(T(self.lang, "Configuration"))
-        cfg_layout = QGridLayout(self.cfg_group)
+        cfg_layout = QVBoxLayout(self.cfg_group)
+
+        self.config_tabs = QTabWidget()
+        cfg_layout.addWidget(self.config_tabs, 1)
+
+        self.settings_tab = QWidget()
+        settings_layout = QGridLayout(self.settings_tab)
+        settings_layout.setContentsMargins(12, 12, 12, 12)
+        settings_layout.setColumnStretch(1, 1)
+
+        self.custom_tab = QWidget()
+        custom_layout = QGridLayout(self.custom_tab)
+        custom_layout.setContentsMargins(12, 12, 12, 12)
+        custom_layout.setColumnStretch(1, 1)
+
+        self.settings_tab_index = self.config_tabs.addTab(
+            self.settings_tab, T(self.lang, "ConfigTabSettings")
+        )
+        self.custom_tab_index = self.config_tabs.addTab(
+            self.custom_tab, T(self.lang, "ConfigTabCustom")
+        )
 
         self.path_edit = QLineEdit()
         self.path_edit.setPlaceholderText(
@@ -139,10 +160,6 @@ class MainWindow(QMainWindow):
         self.mode_group.addButton(self.mode_random_radio)
         self.mode_group.addButton(self.mode_custom_radio)
         self.mode_normal_radio.setChecked(True)
-
-        self.custom_widget = QWidget()
-        custom_layout = QGridLayout(self.custom_widget)
-        custom_layout.setContentsMargins(0, 0, 0, 0)
 
         self.preset_label = QLabel(T(self.lang, "PresetLabel"))
         self.preset_combo = QComboBox()
@@ -216,7 +233,8 @@ class MainWindow(QMainWindow):
         template_row.addStretch(1)
         custom_layout.addLayout(template_row, 5, 1, 1, 3)
 
-        self.custom_widget.setEnabled(False)
+        self.config_tabs.setTabEnabled(self.custom_tab_index, False)
+        self.custom_tab.setEnabled(False)
 
         self.mode_combo = QComboBox()
         self.mode_combo.addItems(["dark", "light"])
@@ -233,40 +251,40 @@ class MainWindow(QMainWindow):
 
         row = 0
         self.sample_folder_label = QLabel(T(self.lang, "Sample folder"))
-        cfg_layout.addWidget(self.sample_folder_label, row, 0)
+        settings_layout.addWidget(self.sample_folder_label, row, 0)
         folder_row = QHBoxLayout()
         folder_row.addWidget(self.path_edit, 1)
         folder_row.addWidget(self.browse_btn, 0)
-        cfg_layout.addLayout(folder_row, row, 1)
+        settings_layout.addLayout(folder_row, row, 1)
         row += 1
 
-        cfg_layout.addWidget(self.warn_label, row, 0, 1, 2)
+        settings_layout.addWidget(self.warn_label, row, 0, 1, 2)
         row += 1
 
         self.starting_note_label = QLabel(T(self.lang, "Starting note"))
-        cfg_layout.addWidget(self.starting_note_label, row, 0)
-        cfg_layout.addWidget(self.note_combo, row, 1)
+        settings_layout.addWidget(self.starting_note_label, row, 0)
+        settings_layout.addWidget(self.note_combo, row, 1)
         row += 1
 
         self.starting_octave_label = QLabel(T(self.lang, "Starting octave"))
-        cfg_layout.addWidget(self.starting_octave_label, row, 0)
-        cfg_layout.addWidget(self.octave_combo, row, 1)
+        settings_layout.addWidget(self.starting_octave_label, row, 0)
+        settings_layout.addWidget(self.octave_combo, row, 1)
         row += 1
 
         self.semitone_range_label = QLabel(T(self.lang, "Semitone range"))
-        cfg_layout.addWidget(self.semitone_range_label, row, 0)
-        cfg_layout.addWidget(self.range_spin, row, 1)
+        settings_layout.addWidget(self.semitone_range_label, row, 0)
+        settings_layout.addWidget(self.range_spin, row, 1)
         row += 1
 
         self.gap_label = QLabel(T(self.lang, "Gap (seconds)"))
-        cfg_layout.addWidget(self.gap_label, row, 0)
-        cfg_layout.addWidget(self.gap_spin, row, 1)
+        settings_layout.addWidget(self.gap_label, row, 0)
+        settings_layout.addWidget(self.gap_spin, row, 1)
         row += 1
 
-        cfg_layout.addWidget(self.opt_pitched, row, 0, 1, 2)
+        settings_layout.addWidget(self.opt_pitched, row, 0, 1, 2)
         row += 1
 
-        cfg_layout.addWidget(self.opt_dump, row, 0, 1, 2)
+        settings_layout.addWidget(self.opt_dump, row, 0, 1, 2)
         row += 1
 
         mode_row = QHBoxLayout()
@@ -275,16 +293,13 @@ class MainWindow(QMainWindow):
         mode_row.addWidget(self.mode_random_radio)
         mode_row.addWidget(self.mode_custom_radio)
         mode_row.addStretch(1)
-        cfg_layout.addLayout(mode_row, row, 0, 1, 2)
+        settings_layout.addLayout(mode_row, row, 0, 1, 2)
         row += 1
 
-        cfg_layout.addWidget(self.custom_widget, row, 0, 1, 2)
+        settings_layout.addWidget(self.opt_normalize, row, 0, 1, 2)
         row += 1
 
-        cfg_layout.addWidget(self.opt_normalize, row, 0, 1, 2)
-        row += 1
-
-        cfg_layout.addWidget(self.opt_slicex_markers, row, 0, 1, 2)
+        settings_layout.addWidget(self.opt_slicex_markers, row, 0, 1, 2)
         row += 1
 
         appearance_row = QHBoxLayout()
@@ -300,7 +315,10 @@ class MainWindow(QMainWindow):
         appearance_row.addWidget(self.language_label)
         appearance_row.addWidget(self.lang_combo)
         appearance_row.addStretch(1)
-        cfg_layout.addLayout(appearance_row, row, 0, 1, 2)
+        settings_layout.addLayout(appearance_row, row, 0, 1, 2)
+        row += 1
+
+        settings_layout.setRowStretch(row, 1)
 
         self.run_group = QGroupBox(T(self.lang, "Run"))
         run_layout = QVBoxLayout(self.run_group)
@@ -429,6 +447,12 @@ class MainWindow(QMainWindow):
     def retranslate_all(self) -> None:
         self.setWindowTitle(APP_TITLE)
         self.cfg_group.setTitle(T(self.lang, "Configuration"))
+        self.config_tabs.setTabText(
+            self.settings_tab_index, T(self.lang, "ConfigTabSettings")
+        )
+        self.config_tabs.setTabText(
+            self.custom_tab_index, T(self.lang, "ConfigTabCustom")
+        )
         self.run_group.setTitle(T(self.lang, "Run"))
         self.sample_folder_label.setText(T(self.lang, "Sample folder"))
         self.starting_note_label.setText(T(self.lang, "Starting note"))
@@ -513,9 +537,15 @@ class MainWindow(QMainWindow):
             self.current_mode = "random"
         else:
             self.current_mode = "custom"
-        self.custom_widget.setEnabled(self.current_mode == "custom")
+        enable_custom = self.current_mode == "custom"
+        self.custom_tab.setEnabled(enable_custom)
+        self.config_tabs.setTabEnabled(self.custom_tab_index, enable_custom)
+        if enable_custom:
+            self.config_tabs.setCurrentIndex(self.custom_tab_index)
+        elif self.config_tabs.currentIndex() == self.custom_tab_index:
+            self.config_tabs.setCurrentIndex(self.settings_tab_index)
         self.selection_seed.setEnabled(
-            self.current_mode == "custom"
+            enable_custom
             and self.selection_combo.currentData() == "random"
         )
         self.opt_random.setChecked(self.current_mode == "random")
