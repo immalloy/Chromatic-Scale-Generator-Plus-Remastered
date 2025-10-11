@@ -25,6 +25,7 @@ STRINGS = {
     "Light": "Claro",
     "Blue": "Azul",
     "Pink": "Rosa",
+    "Green": "Verde",
     "Apply": "Aplicar",
     "Run": "Ejecutar",
     "Generate Chromatic": "Generar cromática",

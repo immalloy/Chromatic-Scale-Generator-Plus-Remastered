@@ -26,6 +26,7 @@ STRINGS = {
     "Light": "लाइट",
     "Blue": "नीला",
     "Pink": "गुलाबी",
+    "Green": "हरा",
     "Apply": "लागू करें",
     "Run": "चलाएँ",
     "Generate Chromatic": "क्रोमैटिक बनाएँ",

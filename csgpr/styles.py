@@ -9,53 +9,62 @@ Palette = Dict[str, str]
 
 
 PALETTES: dict[PaletteKey, Palette] = {
-    ("dark", "blue"): dict(
-        bg="#121212",
-        panel="#1A1A1A",
-        text="#EDEDED",
-        sub="#C9C9C9",
-        field="#222222",
-        border="#2F2F2F",
-        accent="#2D7CF3",
-        accent2="#5AA1FF",
-        warn="#FFB3B3",
-        muted="#9A9A9A",
+    (
+        "dark",
+        "blue",
+    ): dict(
+        bg="#151924",
+        panel="#1E2432",
+        text="#E7ECF8",
+        sub="#A9B4CC",
+        field="#1A1F2B",
+        border="#2B3142",
+        accent="#4C8DF6",
+        accent_hover="#6EA4FF",
+        accent_active="#3C77E1",
+        accent_soft="#263A5F",
+        accent_outline="#9EC0FF",
+        on_accent="#FFFFFF",
+        warn="#FF9B9B",
+        muted="#7C8397",
     ),
-    ("dark", "pink"): dict(
-        bg="#121212",
-        panel="#1A1A1A",
-        text="#F4F1F6",
-        sub="#D6B2C8",
-        field="#222222",
-        border="#2F2F2F",
-        accent="#FF5AA1",
-        accent2="#FF9AC0",
-        warn="#FFC2D6",
-        muted="#9A9A9A",
+    (
+        "dark",
+        "pink",
+    ): dict(
+        bg="#1A1620",
+        panel="#231C2B",
+        text="#F6EAF5",
+        sub="#D0A9C8",
+        field="#201827",
+        border="#34293E",
+        accent="#FF5F9E",
+        accent_hover="#FF82B6",
+        accent_active="#E24D89",
+        accent_soft="#3D2940",
+        accent_outline="#FFB5D4",
+        on_accent="#FFFFFF",
+        warn="#FFB6C9",
+        muted="#8F7B8E",
     ),
-    ("light", "blue"): dict(
-        bg="#FFFFFF",
-        panel="#FFFFFF",
-        text="#202124",
-        sub="#3C404B",
-        field="#FFFFFF",
-        border="#CDD5E6",
-        accent="#2D7CF3",
-        accent2="#4D90FE",
-        warn="#B3261E",
-        muted="#5F6368",
-    ),
-    ("light", "pink"): dict(
-        bg="#FFFFFF",
-        panel="#FFFFFF",
-        text="#2A1724",
-        sub="#6B3B53",
-        field="#FFFFFF",
-        border="#E4CAD7",
-        accent="#F44A91",
-        accent2="#FF7FBF",
-        warn="#B3261E",
-        muted="#80616F",
+    (
+        "dark",
+        "green",
+    ): dict(
+        bg="#141C1A",
+        panel="#1D2624",
+        text="#E3F4ED",
+        sub="#A3C9BA",
+        field="#18211F",
+        border="#28332F",
+        accent="#4CCD81",
+        accent_hover="#6FE8A1",
+        accent_active="#3BBF72",
+        accent_soft="#2C4336",
+        accent_outline="#8FEBC1",
+        on_accent="#0F1A16",
+        warn="#FFBFA3",
+        muted="#7E928A",
     ),
 }
 
@@ -67,8 +76,11 @@ def _encode_color(color: str) -> str:
 
 
 def build_stylesheet(mode: str, accent: str) -> str:
-    palette = PALETTES[(mode, accent)]
-    highlight_text = "white" if mode == "dark" else palette["text"]
+    key = (mode, accent)
+    if key not in PALETTES:
+        key = ("dark", "pink")
+    palette = PALETTES[key]
+    highlight_text = palette["text"]
     arrow_color = _encode_color(palette["accent"])
     arrow_disabled = _encode_color(palette["border"])
     down_arrow = (
@@ -91,6 +103,30 @@ def build_stylesheet(mode: str, accent: str) -> str:
         f"<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'>"
         f"<path fill='{arrow_disabled}' d='M1 6.5L6 1.5L11 6.5Z'/></svg>"
     )
+    check_mark = (
+        "data:image/svg+xml;utf8," +
+        f"<svg xmlns='http://www.w3.org/2000/svg' width='16' height='12' viewBox='0 0 16 12'>"
+        f"<path fill='{_encode_color(palette['on_accent'])}' d='M6.2 11.2L0.8 6.0L2.7 4.1L6.1 7.3L13.0 0.8L15.2 3.0Z'/>"
+        "</svg>"
+    )
+    check_mark_disabled = (
+        "data:image/svg+xml;utf8," +
+        f"<svg xmlns='http://www.w3.org/2000/svg' width='16' height='12' viewBox='0 0 16 12'>"
+        f"<path fill='{_encode_color(palette['muted'])}' d='M6.2 11.2L0.8 6.0L2.7 4.1L6.1 7.3L13.0 0.8L15.2 3.0Z'/>"
+        "</svg>"
+    )
+    minus_mark = (
+        "data:image/svg+xml;utf8," +
+        f"<svg xmlns='http://www.w3.org/2000/svg' width='16' height='12' viewBox='0 0 16 12'>"
+        f"<rect fill='{_encode_color(palette['on_accent'])}' x='2' y='5' width='12' height='2' rx='1'/>"
+        "</svg>"
+    )
+    minus_mark_disabled = (
+        "data:image/svg+xml;utf8," +
+        f"<svg xmlns='http://www.w3.org/2000/svg' width='16' height='12' viewBox='0 0 16 12'>"
+        f"<rect fill='{_encode_color(palette['muted'])}' x='2' y='5' width='12' height='2' rx='1'/>"
+        "</svg>"
+    )
     return f"""
         QMainWindow {{ background: {palette['bg']}; }}
         QWidget {{
@@ -100,15 +136,15 @@ def build_stylesheet(mode: str, accent: str) -> str:
         QGroupBox {{
             color: {palette['text']};
             border: 1px solid {palette['border']};
-            border-radius: 10px;
+            border-radius: 12px;
             margin-top: 12px;
-            padding-top: 12px;
+            padding-top: 14px;
             background: {palette['panel']};
         }}
         QGroupBox::title {{
             subcontrol-origin: margin;
             left: 10px;
-            padding: 0 4px;
+            padding: 0 6px;
             color: {palette['sub']};
             font-weight: 600;
         }}
@@ -122,7 +158,7 @@ def build_stylesheet(mode: str, accent: str) -> str:
             border-radius: 8px;
             padding: 6px;
             color: {palette['text']};
-            selection-background-color: {palette['accent2']};
+            selection-background-color: {palette['accent_soft']};
             selection-color: {highlight_text};
         }}
         QLineEdit::placeholder, QTextEdit::placeholder, QPlainTextEdit::placeholder {{
@@ -136,12 +172,13 @@ def build_stylesheet(mode: str, accent: str) -> str:
         }}
         QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus, QTextEdit:focus, QPlainTextEdit:focus {{
             border: 1px solid {palette['accent']};
+            background: {palette['panel']};
         }}
         QComboBox QAbstractItemView {{
             background: {palette['panel']};
             border: 1px solid {palette['border']};
             color: {palette['text']};
-            selection-background-color: {palette['accent2']};
+            selection-background-color: {palette['accent_soft']};
             selection-color: {highlight_text};
         }}
         QComboBox::drop-down {{
@@ -192,15 +229,23 @@ def build_stylesheet(mode: str, accent: str) -> str:
         }}
         QPushButton {{
             background: {palette['accent']};
-            border: none;
+            border: 1px solid transparent;
             border-radius: 8px;
             padding: 10px 16px;
-            color: white;
+            color: {palette['on_accent']};
             font-weight: 600;
         }}
-        QPushButton:hover {{ background: {palette['accent2']}; }}
-        QPushButton:pressed {{ background: {palette['accent']}; }}
-        QPushButton:disabled {{ background: {palette['border']}; color: {palette['muted']}; }}
+        QPushButton:hover {{ background: {palette['accent_hover']}; }}
+        QPushButton:pressed {{ background: {palette['accent_active']}; }}
+        QPushButton:focus {{
+            outline: none;
+            border: 1px solid {palette['accent_outline']};
+        }}
+        QPushButton:disabled {{
+            background: {palette['border']};
+            color: {palette['muted']};
+            border: 1px solid {palette['border']};
+        }}
         QProgressBar {{
             background: {palette['field']};
             border: 1px solid {palette['border']};
@@ -209,7 +254,69 @@ def build_stylesheet(mode: str, accent: str) -> str:
             color: {palette['text']};
             height: 18px;
         }}
-        QProgressBar::chunk {{ border-radius: 8px; margin: 1px; background: {palette['accent2']}; }}
+        QProgressBar::chunk {{
+            border-radius: 7px;
+            margin: 1px;
+            background: {palette['accent']};
+        }}
+        QSlider::groove:horizontal {{
+            border: 1px solid {palette['border']};
+            height: 6px;
+            border-radius: 3px;
+            background: {palette['field']};
+        }}
+        QSlider::groove:vertical {{
+            border: 1px solid {palette['border']};
+            width: 6px;
+            border-radius: 3px;
+            background: {palette['field']};
+        }}
+        QSlider::handle:horizontal {{
+            background: {palette['accent']};
+            border: 2px solid {palette['accent_outline']};
+            width: 16px;
+            margin: -6px 0;
+            border-radius: 8px;
+        }}
+        QSlider::handle:horizontal:hover {{ background: {palette['accent_hover']}; }}
+        QSlider::handle:horizontal:pressed {{ background: {palette['accent_active']}; }}
+        QSlider::handle:vertical {{
+            background: {palette['accent']};
+            border: 2px solid {palette['accent_outline']};
+            height: 16px;
+            margin: 0 -6px;
+            border-radius: 8px;
+        }}
+        QSlider::handle:vertical:hover {{ background: {palette['accent_hover']}; }}
+        QSlider::handle:vertical:pressed {{ background: {palette['accent_active']}; }}
+        QScrollBar:vertical {{
+            background: {palette['panel']};
+            width: 12px;
+            margin: 4px 0 4px 0;
+            border: none;
+        }}
+        QScrollBar::handle:vertical {{
+            background: {palette['border']};
+            border-radius: 6px;
+            min-height: 24px;
+        }}
+        QScrollBar::handle:vertical:hover {{ background: {palette['accent_soft']}; }}
+        QScrollBar::handle:vertical:pressed {{ background: {palette['accent']}; }}
+        QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{ height: 0; }}
+        QScrollBar:horizontal {{
+            background: {palette['panel']};
+            height: 12px;
+            margin: 0 4px 0 4px;
+            border: none;
+        }}
+        QScrollBar::handle:horizontal {{
+            background: {palette['border']};
+            border-radius: 6px;
+            min-width: 24px;
+        }}
+        QScrollBar::handle:horizontal:hover {{ background: {palette['accent_soft']}; }}
+        QScrollBar::handle:horizontal:pressed {{ background: {palette['accent']}; }}
+        QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {{ width: 0; }}
         QStatusBar {{
             background: {palette['panel']};
             color: {palette['sub']};
@@ -227,14 +334,14 @@ def build_stylesheet(mode: str, accent: str) -> str:
             margin: 0 4px;
             border-radius: 6px;
         }}
-        QMenuBar::item:selected {{ background: {palette['accent2']}; color: {highlight_text}; }}
+        QMenuBar::item:selected {{ background: {palette['accent_soft']}; color: {highlight_text}; }}
         QMenu {{
             background: {palette['panel']};
             color: {palette['text']};
             border: 1px solid {palette['border']};
         }}
         QMenu::item {{ padding: 6px 24px; border-radius: 4px; }}
-        QMenu::item:selected {{ background: {palette['accent2']}; color: {highlight_text}; }}
+        QMenu::item:selected {{ background: {palette['accent_soft']}; color: {highlight_text}; }}
         QDialog, QMessageBox {{
             background: {palette['panel']};
             color: {palette['text']};
@@ -243,6 +350,42 @@ def build_stylesheet(mode: str, accent: str) -> str:
         QDialog QPushButton, QMessageBox QPushButton {{
             padding: 8px 14px;
             border-radius: 8px;
+        }}
+        QCheckBox::indicator {{
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
+            border: 1px solid {palette['border']};
+            background: {palette['field']};
+        }}
+        QCheckBox::indicator:hover {{ border: 1px solid {palette['accent_hover']}; }}
+        QCheckBox::indicator:checked {{
+            border: 1px solid {palette['accent']};
+            background: {palette['accent']};
+            image: url({check_mark});
+        }}
+        QCheckBox::indicator:checked:hover {{
+            border: 1px solid {palette['accent_hover']};
+            background: {palette['accent_hover']};
+        }}
+        QCheckBox::indicator:checked:disabled {{
+            border: 1px solid {palette['border']};
+            background: {palette['border']};
+            image: url({check_mark_disabled});
+        }}
+        QCheckBox::indicator:disabled {{
+            border: 1px solid {palette['border']};
+            background: {palette['panel']};
+        }}
+        QCheckBox::indicator:indeterminate {{
+            border: 1px solid {palette['accent']};
+            background: {palette['accent']};
+            image: url({minus_mark});
+        }}
+        QCheckBox::indicator:indeterminate:disabled {{
+            border: 1px solid {palette['border']};
+            background: {palette['border']};
+            image: url({minus_mark_disabled});
         }}
         QToolTip {{
             background: {palette['panel']};
@@ -260,7 +403,7 @@ def build_stylesheet(mode: str, accent: str) -> str:
             padding: 0px;
             font-weight: 600;
         }}
-        #LinkButton:hover {{ color: {palette['accent2']}; }}
-        #LinkButton:pressed {{ color: {palette['accent']}; opacity: 0.8; }}
+        #LinkButton:hover {{ color: {palette['accent_hover']}; }}
+        #LinkButton:pressed {{ color: {palette['accent_active']}; opacity: 0.9; }}
         #LinkButton:disabled {{ color: {palette['muted']}; }}
     """

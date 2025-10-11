@@ -68,8 +68,8 @@ class SettingsDialog(QDialog):
         self.preview_mode = mode
         self.preview_accent = accent
 
-        self.theme_options = ["dark", "light"]
-        self.accent_options = ["blue", "pink"]
+        self.theme_options = ["dark"]
+        self.accent_options = ["pink", "blue", "green"]
 
         layout = QVBoxLayout(self)
         layout.setSpacing(16)
@@ -132,23 +132,25 @@ class SettingsDialog(QDialog):
         lang = self.preview_lang
         combo.blockSignals(True)
         combo.clear()
+        label_map = {
+            "dark": T(lang, "Dark"),
+            "blue": T(lang, "Blue"),
+            "pink": T(lang, "Pink"),
+            "green": T(lang, "Green"),
+        }
         for value in items:
-            if value == "dark":
-                label = T(lang, "Dark")
-            elif value == "light":
-                label = T(lang, "Light")
-            elif value == "blue":
-                label = T(lang, "Blue")
-            elif value == "pink":
-                label = T(lang, "Pink")
-            else:
-                label = value
+            label = label_map.get(value, value)
             combo.addItem(label, value)
         idx = combo.findData(current)
         if idx < 0:
             idx = 0
         combo.setCurrentIndex(idx)
         combo.blockSignals(False)
+        current_data = combo.currentData()
+        if combo is self.theme_combo and current_data:
+            self.preview_mode = str(current_data)
+        if combo is self.accent_combo and current_data:
+            self.preview_accent = str(current_data)
 
     def _populate_languages(self) -> None:
         combo = self.lang_combo

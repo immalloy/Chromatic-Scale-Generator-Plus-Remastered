@@ -156,6 +156,7 @@ BASE_STRINGS: Dict[str, str] = {
     "Light": "Light",
     "Blue": "Blue",
     "Pink": "Pink",
+    "Green": "Green",
     "Apply": "Apply",
     "Run": "Run",
     "Generate Chromatic": "Generate Chromatic",

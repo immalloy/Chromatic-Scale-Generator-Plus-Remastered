@@ -26,6 +26,7 @@ STRINGS = {
     "Light": "Светлая",
     "Blue": "Синий",
     "Pink": "Розовый",
+    "Green": "Зелёный",
     "Apply": "Применить",
     "Run": "Старт",
     "Generate Chromatic": "Собрать хроматику",

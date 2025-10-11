@@ -26,6 +26,7 @@ STRINGS = {
     "Light": "ライト",
     "Blue": "ブルー",
     "Pink": "ピンク",
+    "Green": "緑",
     "Apply": "適用",
     "Run": "実行",
     "Generate Chromatic": "クロマチックを作成",

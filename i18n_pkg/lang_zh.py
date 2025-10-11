@@ -26,6 +26,7 @@ STRINGS = {
     "Light": "浅色",
     "Blue": "蓝色",
     "Pink": "粉色",
+    "Green": "绿色",
     "Apply": "应用",
     "Run": "运行",
     "Generate Chromatic": "生成半音阶",
