@@ -175,10 +175,13 @@ class MainWindow(QMainWindow):
         btns_row = QHBoxLayout()
         btns_row.setSpacing(10)
         self.generate_btn = QPushButton(T(self.lang, "Generate Chromatic"))
+        self.generate_btn.setObjectName("GenerateButton")
         self.generate_btn.setEnabled(False)
         self.cancel_btn = QPushButton(T(self.lang, "Cancel"))
+        self.cancel_btn.setObjectName("CancelButton")
         self.cancel_btn.setEnabled(False)
         self.open_out_btn = QPushButton(T(self.lang, "Open Output Folder"))
+        self.open_out_btn.setObjectName("OpenOutputButton")
         self.open_out_btn.setEnabled(False)
         btns_row.addWidget(self.generate_btn)
         btns_row.addWidget(self.cancel_btn)
@@ -236,6 +239,8 @@ class MainWindow(QMainWindow):
         self.tutorial_btn.clicked.connect(self.open_tutorial)
         self.credits_btn.clicked.connect(self.show_credits)
         self.settings_footer_btn.clicked.connect(self.open_settings_dialog)
+        self.range_spin.valueChanged.connect(self.refresh_button_state)
+        self.gap_spin.valueChanged.connect(self.refresh_button_state)
 
         self.worker: GenerateWorker | None = None
         self.last_output_path: Path | None = None
@@ -391,6 +396,10 @@ class MainWindow(QMainWindow):
             and os.path.exists(self.last_output_path)
         )
 
+    def _reset_output_state(self) -> None:
+        self.last_output_path = None
+        self.refresh_button_state()
+
     def choose_folder(self) -> None:
         path = QFileDialog.getExistingDirectory(
             self, T(self.lang, "Select Sample Folder"), os.path.expanduser("~")
@@ -476,9 +485,7 @@ class MainWindow(QMainWindow):
         self.worker.cancelled.connect(self.on_cancelled)
         self.worker.finished.connect(self.on_worker_finished)
 
-        self.generate_btn.setEnabled(False)
-        self.cancel_btn.setEnabled(True)
-        self.open_out_btn.setEnabled(False)
+        self._reset_output_state()
 
         self.statusBar().showMessage(T(self.lang, "Generating…"))
         self.worker.start()
@@ -507,7 +514,7 @@ class MainWindow(QMainWindow):
         self.append_log(T(self.lang, "✅ Completed! Output: {p}", p=out_path))
         self.progress.setValue(100)
         self.last_output_path = Path(out_path)
-        self.open_out_btn.setEnabled(True)
+        self.refresh_button_state()
 
     @Slot(str)
     def on_error(self, msg: str) -> None:

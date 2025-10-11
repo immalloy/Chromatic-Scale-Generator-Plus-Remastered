@@ -9,14 +9,14 @@ Palette = Dict[str, str]
 
 
 _BASE_DARK: Palette = dict(
-    bg="#121418",
-    panel="#1A1D24",
-    text="#E5E9F2",
-    sub="#B6BDCF",
-    field="#202430",
-    border="#2A303D",
+    bg="#15171D",
+    panel="#1C1F27",
+    text="#EFF2FA",
+    sub="#BBC3D8",
+    field="#242832",
+    border="#303645",
     warn="#FFB3B3",
-    muted="#8C94A5",
+    muted="#8F97AA",
 )
 
 _ACCENTS: dict[str, Palette] = {
@@ -234,6 +234,42 @@ def build_stylesheet(mode: str, accent: str) -> str:
             background: {palette['border']};
             color: {palette['muted']};
             border: 1px solid {palette['border']};
+        }}
+        QPushButton#CancelButton {{
+            background: {palette['border']};
+            color: {palette['muted']};
+            border: 1px solid {palette['border']};
+        }}
+        QPushButton#CancelButton:enabled {{
+            background: {palette['accent_soft']};
+            color: {highlight_text};
+            border: 1px solid {palette['accent']};
+        }}
+        QPushButton#CancelButton:enabled:hover {{
+            background: {palette['accent']};
+            border-color: {palette['accent']};
+        }}
+        QPushButton#CancelButton:enabled:pressed {{
+            background: {palette['accent_active']};
+            border-color: {palette['accent_active']};
+        }}
+        QPushButton#OpenOutputButton {{
+            background: {palette['border']};
+            color: {palette['muted']};
+            border: 1px solid {palette['border']};
+        }}
+        QPushButton#OpenOutputButton:enabled {{
+            background: {palette['accent_soft']};
+            color: {highlight_text};
+            border: 1px solid {palette['accent_outline']};
+        }}
+        QPushButton#OpenOutputButton:enabled:hover {{
+            background: {palette['accent']};
+            border-color: {palette['accent']};
+        }}
+        QPushButton#OpenOutputButton:enabled:pressed {{
+            background: {palette['accent_active']};
+            border-color: {palette['accent_active']};
         }}
         QProgressBar {{
             background: {palette['field']};

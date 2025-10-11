@@ -68,7 +68,6 @@ class SettingsDialog(QDialog):
         self.preview_mode = mode
         self.preview_accent = accent
 
-        self.theme_options = ["dark"]
         self.accent_options = ["pink", "blue", "green"]
 
         layout = QVBoxLayout(self)
@@ -80,11 +79,6 @@ class SettingsDialog(QDialog):
 
         form = QFormLayout()
         form.setSpacing(12)
-
-        self.theme_label = QLabel()
-        self.theme_combo = QComboBox()
-        self.theme_combo.currentIndexChanged.connect(self._update_theme)
-        form.addRow(self.theme_label, self.theme_combo)
 
         self.accent_label = QLabel()
         self.accent_combo = QComboBox()
@@ -117,11 +111,9 @@ class SettingsDialog(QDialog):
         self.description.setText(
             T(lang, "Adjust appearance and language preferences.")
         )
-        self.theme_label.setText(T(lang, "Theme:"))
         self.accent_label.setText(T(lang, "Accent:"))
         self.language_label.setText(T(lang, "Language:"))
 
-        self._populate_combo(self.theme_combo, self.theme_options, self.preview_mode)
         self._populate_combo(self.accent_combo, self.accent_options, self.preview_accent)
         self._populate_languages()
 
@@ -133,7 +125,6 @@ class SettingsDialog(QDialog):
         combo.blockSignals(True)
         combo.clear()
         label_map = {
-            "dark": T(lang, "Dark"),
             "blue": T(lang, "Blue"),
             "pink": T(lang, "Pink"),
             "green": T(lang, "Green"),
@@ -147,8 +138,6 @@ class SettingsDialog(QDialog):
         combo.setCurrentIndex(idx)
         combo.blockSignals(False)
         current_data = combo.currentData()
-        if combo is self.theme_combo and current_data:
-            self.preview_mode = str(current_data)
         if combo is self.accent_combo and current_data:
             self.preview_accent = str(current_data)
 
@@ -164,11 +153,6 @@ class SettingsDialog(QDialog):
         combo.setCurrentIndex(idx)
         combo.blockSignals(False)
 
-    def _update_theme(self) -> None:
-        data = self.theme_combo.currentData()
-        if data:
-            self.preview_mode = str(data)
-
     def _update_accent(self) -> None:
         data = self.accent_combo.currentData()
         if data:
@@ -181,7 +165,6 @@ class SettingsDialog(QDialog):
             self.retranslate()
 
     def _accept(self) -> None:
-        self._update_theme()
         self._update_accent()
         data = self.lang_combo.currentData()
         if data:
