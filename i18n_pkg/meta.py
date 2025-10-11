@@ -113,6 +113,21 @@ _MONTH_NAMES: Dict[str, List[str]] = {
         "Novembre",
         "Décembre",
     ],
+    "id": [
+        "",
+        "Januari",
+        "Februari",
+        "Maret",
+        "April",
+        "Mei",
+        "Juni",
+        "Juli",
+        "Agustus",
+        "September",
+        "Oktober",
+        "November",
+        "Desember",
+    ]
 }
 
 
