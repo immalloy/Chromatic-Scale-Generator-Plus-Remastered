@@ -9,6 +9,7 @@ from pathlib import Path
 from PySide6.QtCore import QUrl, Slot
 from PySide6.QtGui import QAction, QDesktopServices, QIcon, QTextCursor
 from PySide6.QtWidgets import (
+    QApplication,
     QCheckBox,
     QComboBox,
     QDoubleSpinBox,
@@ -244,7 +245,11 @@ class MainWindow(QMainWindow):
         self.refresh_button_state()
 
     def apply_theme(self) -> None:
-        self.setStyleSheet(build_stylesheet(self.mode, self.accent))
+        stylesheet = build_stylesheet(self.mode, self.accent)
+        app = QApplication.instance()
+        if app is not None:
+            app.setStyleSheet(stylesheet)
+        self.setStyleSheet(stylesheet)
 
     def build_menus(self) -> None:
         menu_bar = self.menuBar()
