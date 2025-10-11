@@ -1,170 +1,276 @@
 from __future__ import annotations
 
-"""Qt stylesheet helpers."""
+"""Qt stylesheet helpers for the Chromatic Scale Generator PLUS!"""
 
-from typing import Dict, Tuple
+from dataclasses import dataclass
+from typing import Dict
 
-PaletteKey = Tuple[str, str]
-Palette = Dict[str, str]
+__all__ = ["DEFAULT_ACCENT", "VALID_ACCENTS", "build_stylesheet"]
 
 
-PALETTES: dict[PaletteKey, Palette] = {
-    ("dark", "blue"): dict(
-        bg="#121212",
-        panel="#1A1A1A",
-        text="#EDEDED",
-        sub="#C9C9C9",
-        field="#222222",
-        border="#2F2F2F",
-        accent="#2D7CF3",
-        accent2="#5AA1FF",
-        warn="#FFB3B3",
-        muted="#9A9A9A",
+@dataclass(frozen=True)
+class AccentPalette:
+    primary: str
+    hover: str
+    disabled: str
+    outline: str
+    subtle: str
+
+
+BASE_COLORS: Dict[str, str] = {
+    "window_bg": "#0E1018",
+    "card_bg": "#171B26",
+    "card_border": "#1F2433",
+    "text_primary": "#F4F6FB",
+    "text_secondary": "#A7ADC2",
+    "field_bg": "#11141D",
+    "field_border": "#262C3C",
+    "divider": "#202638",
+    "error": "#FF7A9E",
+    "muted": "#8D94AA",
+    "scroll_track": "#1B2130",
+    "scroll_thumb": "#2C3244",
+}
+
+ACCENTS: Dict[str, AccentPalette] = {
+    "pink": AccentPalette(
+        primary="#FF4D8F",
+        hover="#FF6AA7",
+        disabled="#4B2E3D",
+        outline="#FF9FC7",
+        subtle="#E55D9C",
     ),
-    ("dark", "pink"): dict(
-        bg="#121212",
-        panel="#1A1A1A",
-        text="#F4F1F6",
-        sub="#D6B2C8",
-        field="#222222",
-        border="#2F2F2F",
-        accent="#FF5AA1",
-        accent2="#FF9AC0",
-        warn="#FFC2D6",
-        muted="#9A9A9A",
-    ),
-    ("light", "blue"): dict(
-        bg="#F4F6FB",
-        panel="#FFFFFF",
-        text="#202124",
-        sub="#596072",
-        field="#FFFFFF",
-        border="#D2D6E5",
-        accent="#2D7CF3",
-        accent2="#4D90FE",
-        warn="#B3261E",
-        muted="#6F7383",
-    ),
-    ("light", "pink"): dict(
-        bg="#FBF6FA",
-        panel="#FFFFFF",
-        text="#251723",
-        sub="#7A4D63",
-        field="#FFFFFF",
-        border="#E3D0DA",
-        accent="#F44A91",
-        accent2="#FF7FBF",
-        warn="#B3261E",
-        muted="#8A6F7B",
+    "blue": AccentPalette(
+        primary="#5B7CFF",
+        hover="#7895FF",
+        disabled="#2C3352",
+        outline="#9DB2FF",
+        subtle="#4D6AEB",
     ),
 }
 
+DEFAULT_ACCENT = "pink"
+VALID_ACCENTS = tuple(ACCENTS.keys())
 
-def build_stylesheet(mode: str, accent: str) -> str:
-    palette = PALETTES[(mode, accent)]
-    highlight_text = "white" if mode == "dark" else palette["text"]
+
+def build_stylesheet(accent: str = DEFAULT_ACCENT) -> str:
+    palette = ACCENTS.get(accent, ACCENTS[DEFAULT_ACCENT])
+    base = BASE_COLORS
     return f"""
-        QMainWindow {{ background: {palette['bg']}; }}
-        QWidget {{ color: {palette['text']}; }}
-        QGroupBox {{
-            color: {palette['text']};
-            border: 1px solid {palette['border']};
-            border-radius: 10px;
-            margin-top: 12px;
-            padding-top: 12px;
-            background: {palette['panel']};
-        }}
-        QGroupBox::title {{
-            subcontrol-origin: margin;
-            left: 10px;
-            padding: 0 4px;
-            color: {palette['sub']};
-            font-weight: 600;
-        }}
-        QLabel, QCheckBox, QStatusBar, QSpinBox, QDoubleSpinBox, QComboBox, QLineEdit {{
-            color: {palette['text']};
+        QMainWindow {{
+            background-color: {base['window_bg']};
+            color: {base['text_primary']};
+            font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
             font-size: 14px;
         }}
-        QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox, QTextEdit, QPlainTextEdit {{
-            background: {palette['field']};
-            border: 1px solid {palette['border']};
-            border-radius: 8px;
-            padding: 6px;
-            color: {palette['text']};
-            selection-background-color: {palette['accent2']};
-            selection-color: {highlight_text};
+        QWidget {{
+            color: {base['text_primary']};
+            font-size: 14px;
         }}
-        QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus, QTextEdit:focus, QPlainTextEdit:focus {{
-            border: 1px solid {palette['accent']};
+        #HeaderBar {{
+            background: transparent;
+        }}
+        QLabel#HeaderTitle {{
+            font-size: 24px;
+            font-weight: 700;
+            color: {base['text_primary']};
+        }}
+        QFrame#Divider {{
+            border-top: 1px solid {base['divider']};
+            margin-top: 12px;
+        }}
+        QFrame#CardFrame {{
+            background-color: {base['card_bg']};
+            border: 1px solid {base['card_border']};
+            border-radius: 16px;
+        }}
+        QLabel#CardTitle {{
+            font-size: 18px;
+            font-weight: 600;
+            color: {base['text_primary']};
+        }}
+        QLabel#CardSubtitle, QLabel#MutedLabel {{
+            color: {base['text_secondary']};
+            line-height: 1.4em;
+        }}
+        QLabel#SectionHeader {{
+            color: {base['text_primary']};
+            font-weight: 600;
+            margin-top: 4px;
+        }}
+        QLabel#ValidationLabel {{
+            color: {base['error']};
+            font-size: 12px;
+        }}
+        QLabel#FooterLabel {{
+            color: {base['muted']};
+            font-size: 12px;
+        }}
+        QSplitter::handle {{
+            background-color: {base['divider']};
+            width: 2px;
+        }}
+        QSplitter::handle:hover {{
+            background-color: {palette.subtle};
+        }}
+        QLineEdit, QSpinBox, QDoubleSpinBox, QComboBox, QPlainTextEdit {{
+            background-color: {base['field_bg']};
+            border: 1px solid {base['field_border']};
+            border-radius: 10px;
+            padding: 8px 12px;
+            selection-background-color: {palette.hover};
+            selection-color: {base['text_primary']};
+        }}
+        QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus, QPlainTextEdit:focus {{
+            border: 1px solid {palette.outline};
         }}
         QComboBox QAbstractItemView {{
-            background: {palette['panel']};
-            border: 1px solid {palette['border']};
-            color: {palette['text']};
-            selection-background-color: {palette['accent2']};
-            selection-color: {highlight_text};
+            background: {base['card_bg']};
+            border: 1px solid {base['card_border']};
+            selection-background-color: {palette.hover};
+            selection-color: {base['text_primary']};
         }}
         QPushButton {{
-            background: {palette['accent']};
-            border: none;
-            border-radius: 8px;
-            padding: 10px 16px;
-            color: white;
             font-weight: 600;
+            border-radius: 24px;
+            padding: 10px 18px;
         }}
-        QPushButton:hover {{ background: {palette['accent2']}; }}
-        QPushButton:pressed {{ background: {palette['accent']}; }}
-        QPushButton:disabled {{ background: {palette['border']}; color: {palette['muted']}; }}
-        QProgressBar {{
-            background: {palette['field']};
-            border: 1px solid {palette['border']};
-            border-radius: 8px;
-            text-align: center;
-            color: {palette['text']};
-            height: 18px;
+        QPushButton#QuickActionAccent {{
+            background-color: {palette.primary};
+            color: #0E1018;
+            border: none;
         }}
-        QProgressBar::chunk {{ border-radius: 8px; margin: 1px; background: {palette['accent2']}; }}
-        QStatusBar {{
-            background: {palette['panel']};
-            color: {palette['sub']};
-            border-top: 1px solid {palette['border']};
+        QPushButton#QuickActionAccent:hover {{
+            background-color: {palette.hover};
         }}
-        QStatusBar::item {{ border: none; }}
-        QMenuBar {{
-            background: {palette['panel']};
-            color: {palette['text']};
-            border-bottom: 1px solid {palette['border']};
+        QPushButton#QuickActionAccent:disabled {{
+            background-color: {palette.disabled};
+            color: {base['muted']};
         }}
-        QMenuBar::item {{
+        QPushButton#QuickActionLink,
+        QPushButton#TertiaryAction {{
             background: transparent;
-            padding: 4px 12px;
-            margin: 0 4px;
+            color: {palette.primary};
+            border: 1px solid transparent;
+            padding: 8px 12px;
+        }}
+        QPushButton#QuickActionLink:hover,
+        QPushButton#TertiaryAction:hover {{
+            color: {palette.hover};
+        }}
+        QPushButton#SecondaryAction {{
+            background: transparent;
+            border: 1px solid {palette.primary};
+            color: {palette.primary};
+        }}
+        QPushButton#SecondaryAction:hover {{
+            border-color: {palette.hover};
+            color: {palette.hover};
+        }}
+        QPushButton#PrimaryAction {{
+            background-color: {palette.primary};
+            color: #0E1018;
+            border: none;
+        }}
+        QPushButton#PrimaryAction:hover {{
+            background-color: {palette.hover};
+        }}
+        QPushButton:focus {{
+            outline: none;
+            border: 1px solid {palette.outline};
+        }}
+        QPushButton:disabled {{
+            background-color: {palette.disabled};
+            color: {base['muted']};
+            border-color: {palette.disabled};
+        }}
+        QPushButton#TertiaryAction:disabled {{
+            color: {base['muted']};
+        }}
+        QProgressBar {{
+            background: {base['field_bg']};
+            border: 1px solid {base['field_border']};
+            border-radius: 10px;
+            text-align: center;
+            color: {base['text_primary']};
+            height: 24px;
+        }}
+        QProgressBar::chunk {{
+            border-radius: 10px;
+            background: {palette.primary};
+        }}
+        QPlainTextEdit {{
+            border-radius: 12px;
+            padding: 12px;
+        }}
+        QScrollBar:vertical {{
+            width: 12px;
+            background: {base['scroll_track']};
+            margin: 4px;
             border-radius: 6px;
         }}
-        QMenuBar::item:selected {{ background: {palette['accent2']}; color: {highlight_text}; }}
-        QMenu {{
-            background: {palette['panel']};
-            color: {palette['text']};
-            border: 1px solid {palette['border']};
+        QScrollBar::handle:vertical {{
+            background: {base['scroll_thumb']};
+            border-radius: 6px;
         }}
-        QMenu::item {{ padding: 6px 24px; border-radius: 4px; }}
-        QMenu::item:selected {{ background: {palette['accent2']}; color: {highlight_text}; }}
-        QDialog, QMessageBox {{
-            background: {palette['panel']};
-            color: {palette['text']};
+        QScrollBar:horizontal {{
+            height: 12px;
+            background: {base['scroll_track']};
+            margin: 4px;
+            border-radius: 6px;
         }}
-        QDialog QLabel, QMessageBox QLabel {{ color: {palette['text']}; }}
-        QDialog QPushButton, QMessageBox QPushButton {{
-            padding: 8px 14px;
-            border-radius: 8px;
+        QScrollBar::handle:horizontal {{
+            background: {base['scroll_thumb']};
+            border-radius: 6px;
         }}
+        QCheckBox {{
+            spacing: 8px;
+        }}
+        QCheckBox::indicator {{
+            width: 18px;
+            height: 18px;
+            border-radius: 4px;
+            border: 1px solid {base['field_border']};
+            background: {base['field_bg']};
+        }}
+        QCheckBox::indicator:checked {{
+            background: {palette.primary};
+            border: 1px solid {palette.primary};
+        }}
+        QCheckBox::indicator:disabled {{
+            background: {palette.disabled};
+            border-color: {palette.disabled};
+        }}
+        QStatusBar {{
+            background: {base['card_bg']};
+            color: {base['text_secondary']};
+            border-top: 1px solid {base['card_border']};
+        }}
+        QStatusBar::item {{ border: none; }}
         QToolTip {{
-            background: {palette['panel']};
-            color: {palette['text']};
-            border: 1px solid {palette['border']};
-            padding: 6px 8px;
+            background: {base['card_bg']};
+            color: {base['text_primary']};
+            border: 1px solid {base['card_border']};
+            border-radius: 8px;
+            padding: 6px 10px;
         }}
-        #Footer {{ color: {palette['sub']}; font-size: 12px; padding: 8px 0; }}
-        #WarnLabel {{ color: {palette['warn']}; font-size: 12px; }}
-        #LinkButton {{ background: transparent; color: {palette['accent']}; border: none; text-decoration: underline; padding: 0px; font-weight: 600; }}
+        QDialog {{
+            background: {base['card_bg']};
+            color: {base['text_primary']};
+        }}
+        QTabWidget::pane {{
+            border: 1px solid {base['card_border']};
+            border-radius: 12px;
+            padding: 12px;
+            background: {base['window_bg']};
+        }}
+        QTabBar::tab {{
+            background: transparent;
+            color: {base['text_secondary']};
+            padding: 8px 16px;
+            border: none;
+        }}
+        QTabBar::tab:selected {{
+            color: {palette.primary};
+        }}
     """

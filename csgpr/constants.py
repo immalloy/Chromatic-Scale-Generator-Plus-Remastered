@@ -21,7 +21,7 @@ def _base_dir() -> Path:
     return Path(__file__).resolve().parent.parent
 
 
-APP_TITLE = "Chromatic Scale Generator Plus Remastered"
+APP_TITLE = "Chromatic Scale Generator PLUS!"
 APP_ICON_PATH = str(_base_dir() / "icon.ico")
 DEFAULT_SR = 48000
 NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
