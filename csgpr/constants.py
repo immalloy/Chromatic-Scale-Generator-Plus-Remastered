@@ -5,6 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 import sys
 
+from PySide6.QtCore import QSize
+
 
 def _base_dir() -> Path:
     """Return the directory where bundled resources live.
@@ -33,3 +35,4 @@ PROJECT_WIKI_URL = (
 PROJECT_TUTORIAL_URL = (
     "https://github.com/immalloy/Chromatic-Scale-Generator-Plus-Remastered/wiki/Tutorial"
 )
+SPLASH_SIZE = QSize(1920, 1080)

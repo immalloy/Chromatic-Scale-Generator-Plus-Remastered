@@ -186,5 +186,8 @@ BASE_STRINGS: Dict[str, str] = {
     "Embedding FL Studio Slicex slice markers...": "Embedding FL Studio Slicex slice markers...",
     "Saved: {path}": "Saved: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "Dumped {n} pitched sample(s) to: {dir}",
+    "SplashTitle": "Chromatic Scale Generator PLUS! (REMASTERED)",
+    "SplashSubtitle": "Warming up the oscillators…",
+    "SplashCredits": "Credits: @ChillSpaceIRL • @nullfreq_ • Malloy",
 }
 
