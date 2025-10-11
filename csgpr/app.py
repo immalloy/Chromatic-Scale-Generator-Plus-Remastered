@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 import sys
 
-from PySide6.QtCore import QLocale, QPoint, QRect, QSize, Qt
+from PySide6.QtCore import QElapsedTimer, QLocale, QPoint, QRect, QSize, Qt, QThread
 from PySide6.QtGui import (
     QColor,
     QFont,
@@ -20,7 +20,12 @@ from PySide6.QtWidgets import QApplication, QSplashScreen
 
 from i18n_pkg import T, list_languages
 
-from .constants import APP_ICON_PATH, SPLASH_SIZE
+from .constants import (
+    APP_ICON_PATH,
+    SPLASH_ART_PATH,
+    SPLASH_MIN_DURATION_MS,
+    SPLASH_SIZE,
+)
 from .main_window import MainWindow
 
 
@@ -34,10 +39,13 @@ def main() -> None:
         T(splash_lang, "SplashTitle"),
         T(splash_lang, "SplashSubtitle"),
         T(splash_lang, "SplashCredits"),
+        SPLASH_ART_PATH,
     )
     splash = QSplashScreen(splash_pixmap)
     splash.setWindowFlag(Qt.WindowStaysOnTopHint)
     splash.show()
+    splash_timer = QElapsedTimer()
+    splash_timer.start()
     app.processEvents()
 
     try:
@@ -48,6 +56,7 @@ def main() -> None:
 
     window = MainWindow()
     window.show()
+    _enforce_minimum_splash_duration(app, splash_timer, SPLASH_MIN_DURATION_MS)
     splash.finish(window)
     sys.exit(app.exec())
 
@@ -63,7 +72,12 @@ def _detect_initial_language() -> str:
 
 
 def _build_splash_pixmap(
-    size: QSize, icon_path: str, title: str, subtitle: str, credits: str
+    size: QSize,
+    icon_path: str,
+    title: str,
+    subtitle: str,
+    credits: str,
+    art_path: str | None,
 ) -> QPixmap:
     """Create a stylised pixmap used by the splash screen."""
 
@@ -73,13 +87,33 @@ def _build_splash_pixmap(
     painter = QPainter(pixmap)
     painter.setRenderHint(QPainter.Antialiasing)
 
-    gradient = QLinearGradient(0, 0, size.width(), size.height())
-    gradient.setColorAt(0.0, QColor(28, 14, 54))
-    gradient.setColorAt(0.4, QColor(58, 22, 90))
-    gradient.setColorAt(1.0, QColor(120, 54, 146))
-    painter.fillRect(pixmap.rect(), gradient)
+    art = QPixmap(art_path) if art_path else QPixmap()
+    if not art.isNull():
+        scaled = art.scaled(
+            size,
+            Qt.KeepAspectRatioByExpanding,
+            Qt.SmoothTransformation,
+        )
+        source_width = min(size.width(), scaled.width())
+        source_height = min(size.height(), scaled.height())
+        source = QRect(
+            max(0, (scaled.width() - source_width) // 2),
+            max(0, (scaled.height() - source_height) // 2),
+            source_width,
+            source_height,
+        )
+        target_rect = QRect(0, 0, source_width, source_height)
+        target_rect.moveCenter(pixmap.rect().center())
+        painter.drawPixmap(target_rect, scaled, source)
+        painter.fillRect(pixmap.rect(), QColor(20, 10, 38, 160))
+    else:
+        gradient = QLinearGradient(0, 0, size.width(), size.height())
+        gradient.setColorAt(0.0, QColor(28, 14, 54))
+        gradient.setColorAt(0.4, QColor(58, 22, 90))
+        gradient.setColorAt(1.0, QColor(120, 54, 146))
+        painter.fillRect(pixmap.rect(), gradient)
 
-    margin = 96
+    margin = int(size.width() * 0.055)
 
     painter.save()
     painter.setPen(Qt.NoPen)
@@ -87,15 +121,15 @@ def _build_splash_pixmap(
     painter.drawEllipse(
         int(size.width() * 0.55),
         -int(size.height() * 0.25),
-        int(size.width() * 0.9),
-        int(size.height() * 0.9),
+        int(size.width() * 0.78),
+        int(size.height() * 0.78),
     )
     painter.setBrush(QColor(249, 121, 198, 45))
     painter.drawEllipse(
         -int(size.width() * 0.2),
         int(size.height() * 0.55),
-        int(size.width() * 0.7),
-        int(size.height() * 0.7),
+        int(size.width() * 0.58),
+        int(size.height() * 0.58),
     )
     painter.restore()
 
@@ -106,12 +140,12 @@ def _build_splash_pixmap(
     stroke = QPainterPath()
     stroke.moveTo(margin, size.height() * 0.68)
     stroke.cubicTo(
-        size.width() * 0.28,
+        size.width() * 0.22,
         size.height() * 0.52,
-        size.width() * 0.52,
-        size.height() * 0.88,
-        size.width() * 0.78,
-        size.height() * 0.72,
+        size.width() * 0.5,
+        size.height() * 0.82,
+        size.width() * 0.74,
+        size.height() * 0.68,
     )
     painter.drawPath(stroke)
 
@@ -121,29 +155,29 @@ def _build_splash_pixmap(
     highlight = QPainterPath()
     highlight.moveTo(size.width() * 0.18, size.height() * 0.85)
     highlight.cubicTo(
-        size.width() * 0.34,
-        size.height() * 0.95,
-        size.width() * 0.58,
-        size.height() * 0.95,
-        size.width() * 0.82,
-        size.height() * 0.82,
+        size.width() * 0.3,
+        size.height() * 0.9,
+        size.width() * 0.54,
+        size.height() * 0.94,
+        size.width() * 0.78,
+        size.height() * 0.8,
     )
     painter.drawPath(highlight)
     painter.restore()
 
-    panel_width = int(size.width() * 0.58)
-    panel_height = int(size.height() * 0.32)
-    panel_rect = QRect(margin, margin, panel_width, panel_height)
+    panel_width = int(size.width() * 0.6)
+    panel_height = int(size.height() * 0.44)
+    panel_rect = QRect(margin, int(size.height() * 0.12), panel_width, panel_height)
 
     painter.save()
-    painter.setPen(QColor(255, 255, 255, 40))
-    painter.setBrush(QColor(18, 10, 36, 180))
-    painter.drawRoundedRect(panel_rect, 48, 48)
+    painter.setPen(QColor(255, 255, 255, 60))
+    painter.setBrush(QColor(14, 8, 28, 210))
+    painter.drawRoundedRect(panel_rect, 32, 32)
     painter.restore()
 
-    icon_left = panel_rect.left() + 64
-    icon_top = panel_rect.top() + 64
-    icon_max = panel_rect.height() - 128
+    icon_left = panel_rect.left() + 48
+    icon_top = panel_rect.top() + 52
+    icon_max = min(panel_rect.height() - 120, panel_rect.width() // 4)
 
     icon = QPixmap(icon_path)
     if not icon.isNull():
@@ -155,34 +189,34 @@ def _build_splash_pixmap(
         )
         icon_pos = QPoint(icon_left, icon_top + (icon_max - target.height()) // 2)
         painter.drawPixmap(icon_pos, target)
-        text_left = icon_pos.x() + target.width() + 48
+        text_left = icon_pos.x() + target.width() + 40
     else:
-        text_left = panel_rect.left() + 64
+        text_left = panel_rect.left() + 48
 
-    text_width = panel_rect.right() - text_left - 64
+    text_width = panel_rect.right() - text_left - 48
 
     title_font = QFont()
-    title_font.setPointSize(64)
+    title_font.setPointSizeF(size.height() * 0.066)
     title_font.setBold(True)
     painter.setFont(title_font)
     painter.setPen(QColor("#FFFFFF"))
     title_rect = QRect(
         text_left,
-        panel_rect.top() + 48,
+        panel_rect.top() + 36,
         text_width,
-        panel_rect.height() // 2,
+        int(panel_rect.height() * 0.55),
     )
-    painter.drawText(title_rect, Qt.AlignLeft | Qt.AlignVCenter | Qt.TextWordWrap, title)
+    painter.drawText(title_rect, Qt.AlignLeft | Qt.AlignTop | Qt.TextWordWrap, title)
 
     subtitle_font = QFont()
-    subtitle_font.setPointSize(28)
+    subtitle_font.setPointSizeF(size.height() * 0.033)
     painter.setFont(subtitle_font)
     painter.setPen(QColor("#D8D5FF"))
     subtitle_rect = QRect(
         text_left,
-        panel_rect.top() + panel_rect.height() // 2,
+        title_rect.bottom() + 12,
         text_width,
-        panel_rect.height() // 2 - 48,
+        panel_rect.bottom() - (title_rect.bottom() + 36),
     )
     painter.drawText(
         subtitle_rect,
@@ -190,12 +224,12 @@ def _build_splash_pixmap(
         subtitle,
     )
 
-    credit_width = int(size.width() * 0.3)
+    credit_width = int(size.width() * 0.32)
     credits_panel_rect = QRect(
         size.width() - credit_width - margin,
-        margin,
+        int(size.height() * 0.12),
         credit_width,
-        int(panel_height * 0.85),
+        int(panel_height * 0.72),
     )
 
     painter.save()
@@ -205,7 +239,7 @@ def _build_splash_pixmap(
     painter.restore()
 
     credits_font = QFont()
-    credits_font.setPointSize(28)
+    credits_font.setPointSizeF(size.height() * 0.03)
     credits_font.setItalic(True)
     painter.setFont(credits_font)
     painter.setPen(QColor(240, 226, 255))
@@ -218,6 +252,20 @@ def _build_splash_pixmap(
 
     painter.end()
     return pixmap
+
+
+def _enforce_minimum_splash_duration(
+    app: QApplication, timer: QElapsedTimer, minimum_ms: int
+) -> None:
+    """Block the main thread until the splash has been visible long enough."""
+
+    if minimum_ms <= 0:
+        return
+
+    while timer.elapsed() < minimum_ms:
+        app.processEvents()
+        remaining = minimum_ms - timer.elapsed()
+        QThread.msleep(min(remaining, 50))
 
 
 __all__ = ["main"]

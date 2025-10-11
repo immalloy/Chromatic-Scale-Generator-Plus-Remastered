@@ -21,7 +21,7 @@ def _base_dir() -> Path:
     return Path(__file__).resolve().parent.parent
 
 
-APP_TITLE = "Chromatic Scale Generator PLUS! (REMASTERED)"
+APP_TITLE = "Chromatic Scale Generator Plus Remastered"
 APP_ICON_PATH = str(_base_dir() / "icon.ico")
 DEFAULT_SR = 48000
 NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
@@ -35,4 +35,6 @@ PROJECT_WIKI_URL = (
 PROJECT_TUTORIAL_URL = (
     "https://github.com/immalloy/Chromatic-Scale-Generator-Plus-Remastered/wiki/Tutorial"
 )
-SPLASH_SIZE = QSize(1920, 1080)
+SPLASH_SIZE = QSize(1280, 720)
+SPLASH_ART_PATH = str(_base_dir() / "assets" / "splash.png")
+SPLASH_MIN_DURATION_MS = 2500

@@ -176,7 +176,7 @@ BASE_STRINGS: Dict[str, str] = {
     "⚠️ Generation was cancelled.": "⚠️ Generation was cancelled.",
     "Footer": "Original tool by @ChillSpaceIRL • Remastered by @nullfreq_ and Malloy  |  Version {version} • {month_name} {year}",
     "Join Discord": "Join Discord",
-    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\n\nOriginal tool by @ChillSpaceIRL\nRemastered by @nullfreq_ and Malloy\nVersion {version} • {month_name} {year}\n\nThanks for using the app!",
+    "CreditsText": "Chromatic Scale Generator Plus Remastered\n\nOriginal tool by @ChillSpaceIRL\nRemastered by @nullfreq_ and Malloy\nVersion {version} • {month_name} {year}\n\nThanks for using the app!",
     "Found {n} sample(s) (1.wav..{m}.wav).": "Found {n} sample(s) (1.wav..{m}.wav).",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}",
     "Peak normalization: ON": "Peak normalization: ON",
@@ -186,8 +186,8 @@ BASE_STRINGS: Dict[str, str] = {
     "Embedding FL Studio Slicex slice markers...": "Embedding FL Studio Slicex slice markers...",
     "Saved: {path}": "Saved: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "Dumped {n} pitched sample(s) to: {dir}",
-    "SplashTitle": "Chromatic Scale Generator PLUS! (REMASTERED)",
-    "SplashSubtitle": "Warming up the oscillators…",
+    "SplashTitle": "Chromatic Scale Generator Plus Remastered",
+    "SplashSubtitle": "Loading the oscillators…",
     "SplashCredits": "Credits: @ChillSpaceIRL • @nullfreq_ • Malloy",
 }
 
