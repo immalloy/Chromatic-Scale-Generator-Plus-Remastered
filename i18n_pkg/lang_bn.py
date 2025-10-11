@@ -48,7 +48,7 @@ STRINGS = {
 
     "Footer": "মূল টুল: @ChillSpaceIRL - রিমাস্টার: @nullfreq_ এবং Malloy  |  সংস্করণ {version} - {month_name} {year}",
     "Join Discord": "ডিসকোর্ডে যোগ দিন",
-    "CreditsText": "Chromatic Scale Generator PLUS! (REMASTERED)\n\nমূল টুল: @ChillSpaceIRL\nরিমাস্টার: @nullfreq_ এবং Malloy\nসংস্করণ {version} - {month_name} {year}\n\nধন্যবাদ!",
+    "CreditsText": "Chromatic Scale Generator Plus Remastered\n\nমূল টুল: @ChillSpaceIRL\nরিমাস্টার: @nullfreq_ এবং Malloy\nসংস্করণ {version} - {month_name} {year}\n\nধন্যবাদ!",
 
     "Found {n} sample(s) (1.wav..{m}.wav).": "{n} টি স্যাম্পল পাওয়া গেছে (1.wav..{m}.wav)।",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "সেমিটোন: {s} | গ্যাপ: {g:.3f}সে | পিচড: {p}",
