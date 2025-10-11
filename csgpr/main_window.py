@@ -168,11 +168,18 @@ class MainWindow(QMainWindow):
         run_layout.addWidget(self.progress)
         run_layout.addWidget(self.log, 1)
 
-        btns_row = QHBoxLayout()
-        btns_row.addWidget(self.generate_btn)
-        btns_row.addWidget(self.cancel_btn)
-        btns_row.addWidget(self.open_out_btn)
-        run_layout.addLayout(btns_row)
+        primary_actions = QHBoxLayout()
+        primary_actions.setSpacing(12)
+        primary_actions.addStretch(1)
+        primary_actions.addWidget(self.generate_btn)
+        primary_actions.addWidget(self.cancel_btn)
+        run_layout.addLayout(primary_actions)
+
+        secondary_actions = QHBoxLayout()
+        secondary_actions.setSpacing(12)
+        secondary_actions.addStretch(1)
+        secondary_actions.addWidget(self.open_out_btn)
+        run_layout.addLayout(secondary_actions)
 
         footer_row = QHBoxLayout()
         self.footer = QLabel(T(self.lang, "Footer"))
@@ -181,15 +188,12 @@ class MainWindow(QMainWindow):
         self.wiki_btn.setObjectName("LinkButton")
         self.tutorial_btn = QPushButton(T(self.lang, "Tutorial"))
         self.tutorial_btn.setObjectName("LinkButton")
-        self.settings_btn = QPushButton(T(self.lang, "Settings"))
-        self.settings_btn.setObjectName("LinkButton")
         self.credits_btn = QPushButton(T(self.lang, "Credits"))
         self.credits_btn.setObjectName("LinkButton")
         footer_row.addWidget(self.footer, 1)
         footer_row.addStretch(1)
         footer_row.addWidget(self.wiki_btn, 0)
         footer_row.addWidget(self.tutorial_btn, 0)
-        footer_row.addWidget(self.settings_btn, 0)
         footer_row.addWidget(self.credits_btn, 0)
 
         outer = QVBoxLayout(central)
@@ -197,7 +201,34 @@ class MainWindow(QMainWindow):
         outer.addWidget(self.run_group, 1)
         outer.addLayout(footer_row)
 
-        help_menu = self.menuBar().addMenu(T(self.lang, "&Help"))
+        self.build_menus()
+
+        self.setStatusBar(QStatusBar())
+        self.apply_theme()
+
+        self.path_edit.textChanged.connect(self.refresh_validation)
+        self.generate_btn.clicked.connect(self.start_generation)
+        self.cancel_btn.clicked.connect(self.cancel_generation)
+        self.open_out_btn.clicked.connect(self.open_output_folder_clicked)
+        self.wiki_btn.clicked.connect(self.open_wiki)
+        self.tutorial_btn.clicked.connect(self.open_tutorial)
+        self.credits_btn.clicked.connect(self.show_credits)
+
+        self.worker: GenerateWorker | None = None
+        self.last_output_path: Path | None = None
+
+        self.setAcceptDrops(True)
+        self.refresh_validation()
+        self.refresh_button_state()
+
+    def apply_theme(self) -> None:
+        self.setStyleSheet(build_stylesheet(self.mode, self.accent))
+
+    def build_menus(self) -> None:
+        bar = self.menuBar()
+        bar.clear()
+
+        help_menu = bar.addMenu(T(self.lang, "&Help"))
         act_wiki = QAction(T(self.lang, "Wiki"), self)
         act_wiki.triggered.connect(self.open_wiki)
         help_menu.addAction(act_wiki)
@@ -212,27 +243,9 @@ class MainWindow(QMainWindow):
         act_credits.triggered.connect(self.show_credits)
         help_menu.addAction(act_credits)
 
-        self.setStatusBar(QStatusBar())
-        self.apply_theme()
-
-        self.path_edit.textChanged.connect(self.refresh_validation)
-        self.generate_btn.clicked.connect(self.start_generation)
-        self.cancel_btn.clicked.connect(self.cancel_generation)
-        self.open_out_btn.clicked.connect(self.open_output_folder_clicked)
-        self.wiki_btn.clicked.connect(self.open_wiki)
-        self.tutorial_btn.clicked.connect(self.open_tutorial)
-        self.settings_btn.clicked.connect(self.show_settings)
-        self.credits_btn.clicked.connect(self.show_credits)
-
-        self.worker: GenerateWorker | None = None
-        self.last_output_path: Path | None = None
-
-        self.setAcceptDrops(True)
-        self.refresh_validation()
-        self.refresh_button_state()
-
-    def apply_theme(self) -> None:
-        self.setStyleSheet(build_stylesheet(self.mode, self.accent))
+        settings_action = QAction(T(self.lang, "Settings"), self)
+        settings_action.triggered.connect(self.show_settings)
+        bar.addAction(settings_action)
 
     def retranslate_all(self) -> None:
         self.setWindowTitle(APP_TITLE)
@@ -261,25 +274,10 @@ class MainWindow(QMainWindow):
         self.open_out_btn.setText(T(self.lang, "Open Output Folder"))
         self.wiki_btn.setText(T(self.lang, "Wiki"))
         self.tutorial_btn.setText(T(self.lang, "Tutorial"))
-        self.settings_btn.setText(T(self.lang, "Settings"))
         self.credits_btn.setText(T(self.lang, "Credits"))
         self.footer.setText(T(self.lang, "Footer"))
 
-        self.menuBar().clear()
-        help_menu = self.menuBar().addMenu(T(self.lang, "&Help"))
-        act_wiki = QAction(T(self.lang, "Wiki"), self)
-        act_wiki.triggered.connect(self.open_wiki)
-        help_menu.addAction(act_wiki)
-
-        act_tutorial = QAction(T(self.lang, "Tutorial"), self)
-        act_tutorial.triggered.connect(self.open_tutorial)
-        help_menu.addAction(act_tutorial)
-
-        help_menu.addSeparator()
-
-        act_credits = QAction(T(self.lang, "Credits"), self)
-        act_credits.triggered.connect(self.show_credits)
-        help_menu.addAction(act_credits)
+        self.build_menus()
 
         self.refresh_validation()
 
