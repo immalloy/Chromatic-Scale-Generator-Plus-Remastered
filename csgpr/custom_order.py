@@ -226,13 +226,16 @@ def scan_symbol_buckets(
     if not root.exists():
         return BucketScanResult(buckets={}, unlabeled=[], unknown_symbols={}, warnings=[])
 
+    allowed_order = tuple(dict.fromkeys(symbol.upper() for symbol in allowed_symbols))
+    allowed_key = tuple(sorted(allowed_order))
+
     files = sorted(root.rglob("*.wav"))
     files = [file for file in files if file.name.lower() != "chromatic.wav"]
-    key = (str(root), _fingerprint(files, root))
+    key = (str(root), allowed_key, _fingerprint(files, root))
     if use_cache and key in _SCAN_CACHE:
         return _SCAN_CACHE[key]
 
-    buckets: Dict[str, List[Path]] = {s: [] for s in (s.upper() for s in allowed_symbols)}
+    buckets: Dict[str, List[Path]] = {symbol: [] for symbol in allowed_order}
     unlabeled: List[Path] = []
     unknown: Dict[str, List[Path]] = {}
     warnings: List[str] = []
@@ -257,7 +260,7 @@ def scan_symbol_buckets(
     result = BucketScanResult(
         buckets=buckets,
         unlabeled=sorted(unlabeled),
-        unknown_symbols=unknown,
+        unknown_symbols={sym: sorted(paths) for sym, paths in unknown.items()},
         warnings=warnings,
     )
     if use_cache:
@@ -312,10 +315,12 @@ def resolve_sequence(
     previous_length = -1
 
     def handle_missing(symbol: str) -> None:
+        message = f"Missing symbol {symbol}"
         if preset.on_missing_symbol == "error":
-            raise ResolutionError(f"Missing symbol {symbol}", symbol=symbol)
+            raise ResolutionError(message, symbol=symbol)
         if preset.on_missing_symbol == "ask":
             raise ResolutionError("User confirmation required", symbol=symbol)
+        warnings.append(message)
 
     while True:
         if preset.length_policy == "truncate" and tokens_processed >= tokens_per_pass:

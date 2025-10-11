@@ -774,10 +774,11 @@ class MainWindow(QMainWindow):
                 self.show_error(str(exc))
             return None
         self.last_resolution = result
+        combined_warnings = [*scan_result.warnings, *result.warnings]
         if report:
-            for warning in scan_result.warnings:
+            for warning in combined_warnings:
                 self.append_log(T(self.lang, "WarningLog", msg=warning))
-        return result, scan_result.warnings
+        return result, combined_warnings
 
     def on_preview_clicked(self) -> None:
         resolved = self.resolve_current_preset(report=True)

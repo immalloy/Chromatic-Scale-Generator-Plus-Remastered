@@ -7,6 +7,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import pytest
 
+from csgpr import custom_order
 from csgpr.custom_order import (
     DEFAULT_SYMBOLS,
     CustomOrderPreset,
@@ -113,6 +114,7 @@ def test_missing_symbol_skip(tmp_path: Path) -> None:
     assert len(result.sequence) == 3
     assert all(path == files_a[0] for path in result.sequence if path)
     assert any(item.path is None and item.note == "skipped" for item in result.preview)
+    assert "Missing symbol Z" in result.warnings
 
 
 def test_conflict_resolution(tmp_path: Path) -> None:
@@ -137,6 +139,20 @@ def test_scan_symbol_buckets_ignores_unknown(tmp_path: Path) -> None:
     result = scan_symbol_buckets(tmp_path)
     assert "QQ" in result.unknown_symbols
     assert result.buckets.get("A") == []
+
+
+def test_scan_cache_respects_allowed_symbols(tmp_path: Path) -> None:
+    custom_order._SCAN_CACHE.clear()
+    tagged = tmp_path / "voice__A.wav"
+    tagged.write_bytes(b"")
+
+    result_a = scan_symbol_buckets(tmp_path, allowed_symbols=["A"])
+    assert "A" in result_a.buckets
+    assert result_a.buckets["A"] == [tagged]
+
+    result_z = scan_symbol_buckets(tmp_path, allowed_symbols=["Z"])
+    assert "A" not in result_z.buckets
+    assert result_z.unknown_symbols.get("A") == [tagged]
 
 
 def test_import_fixture_files() -> None:
