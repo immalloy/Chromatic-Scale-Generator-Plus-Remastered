@@ -165,19 +165,19 @@ def _build_splash_pixmap(
     painter.drawPath(highlight)
     painter.restore()
 
-    panel_width = int(size.width() * 0.6)
-    panel_height = int(size.height() * 0.44)
-    panel_rect = QRect(margin, int(size.height() * 0.12), panel_width, panel_height)
+    panel_width = int(size.width() * 0.48)
+    panel_height = int(size.height() * 0.36)
+    panel_rect = QRect(margin, int(size.height() * 0.16), panel_width, panel_height)
 
     painter.save()
-    painter.setPen(QColor(255, 255, 255, 60))
-    painter.setBrush(QColor(14, 8, 28, 210))
-    painter.drawRoundedRect(panel_rect, 32, 32)
+    painter.setPen(QColor(255, 255, 255, 50))
+    painter.setBrush(QColor(14, 8, 28, 200))
+    painter.drawRoundedRect(panel_rect, 26, 26)
     painter.restore()
 
-    icon_left = panel_rect.left() + 48
-    icon_top = panel_rect.top() + 52
-    icon_max = min(panel_rect.height() - 120, panel_rect.width() // 4)
+    icon_left = panel_rect.left() + 36
+    icon_top = panel_rect.top() + 40
+    icon_max = min(panel_rect.height() - 96, panel_rect.width() // 5)
 
     icon = QPixmap(icon_path)
     if not icon.isNull():
@@ -189,34 +189,34 @@ def _build_splash_pixmap(
         )
         icon_pos = QPoint(icon_left, icon_top + (icon_max - target.height()) // 2)
         painter.drawPixmap(icon_pos, target)
-        text_left = icon_pos.x() + target.width() + 40
+        text_left = icon_pos.x() + target.width() + 32
     else:
-        text_left = panel_rect.left() + 48
+        text_left = panel_rect.left() + 40
 
-    text_width = panel_rect.right() - text_left - 48
+    text_width = panel_rect.right() - text_left - 36
 
     title_font = QFont()
-    title_font.setPointSizeF(size.height() * 0.066)
+    title_font.setPointSizeF(size.height() * 0.045)
     title_font.setBold(True)
     painter.setFont(title_font)
     painter.setPen(QColor("#FFFFFF"))
     title_rect = QRect(
         text_left,
-        panel_rect.top() + 36,
+        panel_rect.top() + 28,
         text_width,
-        int(panel_rect.height() * 0.55),
+        int(panel_rect.height() * 0.5),
     )
     painter.drawText(title_rect, Qt.AlignLeft | Qt.AlignTop | Qt.TextWordWrap, title)
 
     subtitle_font = QFont()
-    subtitle_font.setPointSizeF(size.height() * 0.033)
+    subtitle_font.setPointSizeF(size.height() * 0.024)
     painter.setFont(subtitle_font)
     painter.setPen(QColor("#D8D5FF"))
     subtitle_rect = QRect(
         text_left,
-        title_rect.bottom() + 12,
+        title_rect.bottom() + 10,
         text_width,
-        panel_rect.bottom() - (title_rect.bottom() + 36),
+        panel_rect.bottom() - (title_rect.bottom() + 28),
     )
     painter.drawText(
         subtitle_rect,
@@ -224,26 +224,26 @@ def _build_splash_pixmap(
         subtitle,
     )
 
-    credit_width = int(size.width() * 0.32)
+    credit_width = int(size.width() * 0.26)
     credits_panel_rect = QRect(
         size.width() - credit_width - margin,
-        int(size.height() * 0.12),
+        int(size.height() * 0.16),
         credit_width,
-        int(panel_height * 0.72),
+        int(panel_height * 0.62),
     )
 
     painter.save()
-    painter.setPen(QColor(255, 255, 255, 35))
-    painter.setBrush(QColor(36, 18, 64, 170))
-    painter.drawRoundedRect(credits_panel_rect, 36, 36)
+    painter.setPen(QColor(255, 255, 255, 30))
+    painter.setBrush(QColor(36, 18, 64, 160))
+    painter.drawRoundedRect(credits_panel_rect, 28, 28)
     painter.restore()
 
     credits_font = QFont()
-    credits_font.setPointSizeF(size.height() * 0.03)
+    credits_font.setPointSizeF(size.height() * 0.022)
     credits_font.setItalic(True)
     painter.setFont(credits_font)
     painter.setPen(QColor(240, 226, 255))
-    credits_rect = credits_panel_rect.adjusted(32, 32, -32, -32)
+    credits_rect = credits_panel_rect.adjusted(28, 28, -28, -28)
     painter.drawText(
         credits_rect,
         Qt.AlignRight | Qt.AlignTop | Qt.TextWordWrap,
