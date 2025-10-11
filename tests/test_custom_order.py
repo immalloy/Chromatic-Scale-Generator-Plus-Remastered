@@ -123,8 +123,8 @@ def test_conflict_resolution(tmp_path: Path) -> None:
     file_path = folder / "sample__E.wav"
     file_path.write_bytes(b"")
     scan = scan_symbol_buckets(tmp_path)
-    assert scan.buckets.get("E")
-    assert any("overrides" in warning for warning in scan.warnings)
+    assert scan.buckets.get("A") == [file_path]
+    assert any("Folder symbol" in warning for warning in scan.warnings)
 
 
 def test_build_default_sequence_matches_legacy() -> None:
@@ -143,7 +143,9 @@ def test_scan_symbol_buckets_ignores_unknown(tmp_path: Path) -> None:
 
 def test_scan_cache_respects_allowed_symbols(tmp_path: Path) -> None:
     custom_order._SCAN_CACHE.clear()
-    tagged = tmp_path / "voice__A.wav"
+    folder = tmp_path / "A"
+    folder.mkdir()
+    tagged = folder / "voice_take1.wav"
     tagged.write_bytes(b"")
 
     result_a = scan_symbol_buckets(tmp_path, allowed_symbols=["A"])
@@ -152,7 +154,16 @@ def test_scan_cache_respects_allowed_symbols(tmp_path: Path) -> None:
 
     result_z = scan_symbol_buckets(tmp_path, allowed_symbols=["Z"])
     assert "A" not in result_z.buckets
-    assert result_z.unknown_symbols.get("A") == [tagged]
+    assert result_z.unknown_symbols.get("A") is None
+
+
+def test_scan_warns_when_missing_vowel_folder(tmp_path: Path) -> None:
+    tagged = tmp_path / "voice__A.wav"
+    tagged.write_bytes(b"")
+    result = scan_symbol_buckets(tmp_path)
+    assert result.buckets["A"] == []
+    assert tagged in result.unlabeled
+    assert any("not inside a vowel folder" in warning for warning in result.warnings)
 
 
 def test_import_fixture_files() -> None:

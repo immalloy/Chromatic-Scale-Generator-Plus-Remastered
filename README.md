@@ -50,6 +50,29 @@ No more manual pitch editing, no more pain — just clean, playable chromatics i
 * **Credits window** — includes contributors and Discord community link
 * **Unified dialogs** — consistent notifications for information, errors, and warnings
 
+### 🎤 Canonical Sample Layout
+
+Place each vowel into its own folder so the app can group them reliably:
+
+```
+MyCharacter/
+├── A/
+│   ├── take1.wav
+│   └── take2.wav
+├── E/
+│   └── 1.wav
+├── I/
+│   └── harmony.wav
+├── O/
+│   └── lead.wav
+├── U/
+│   └── backup.wav
+└── AY/
+    └── extra.wav
+```
+
+Filename tags like `voice__A.wav` remain optional, but files outside these vowel folders are ignored for symbolic ordering and listed as unlabeled with a warning.
+
 ---
 
 ## 🎚 Example Custom Order Files

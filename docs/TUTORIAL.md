@@ -72,9 +72,9 @@ All controls are disabled until **Custom** mode is selected to keep the classic 
 ## 4. Prepare Your Samples
 
 1. Gather your `.wav` files into a folder.
-2. Add **filename tags** to indicate which vowel each file represents. Use the pattern `sample__A.wav`, `growl__E.wav`, etc. Supported symbols are `A`, `E`, `I`, `O`, `U`, and `AY` (uppercase or lowercase).
-3. If renaming files isn’t convenient, place files into subfolders named after the symbol (e.g., `vocals/A/1.wav`). The filename tag always wins if both are present.
-4. Drop the folder onto the main window or click **Browse** to select it.
+2. Create subfolders for each vowel symbol (`A`, `E`, `I`, `O`, `U`, `AY`) and move the matching takes inside them. Example: `vocals/A/take1.wav`, `vocals/AY/shout.wav`.
+3. (Optional) Add **filename tags** like `sample__A.wav` if you want the files to remain recognizable outside the app. The folder name now takes priority; tag-only files are treated as unlabeled with a warning.
+4. Drop the top-level folder onto the main window or click **Browse** to select it.
 
 The file browser on the left lists every detected sample. Any symbol conflicts or unlabeled files appear with warnings in the log panel.
 
@@ -149,8 +149,8 @@ Try the included examples in [`assets/examples`](../assets/examples/):
 
 | Issue | What to Check |
 | ----- | ------------- |
-| **Files missing from output** | Confirm they have valid symbol tags or folders, and that your preset references those symbols. Preview will highlight skipped tokens. |
-| **“Missing symbol” warnings** | Either rename the file with the `__SYMBOL` pattern or adjust your preset order to omit that symbol. |
+| **Files missing from output** | Make sure every take sits inside the correct vowel folder (`A`, `E`, `I`, `O`, `U`, `AY`). Tag-only files are listed as unlabeled and skipped. Preview will highlight tokens that were dropped. |
+| **“Missing symbol” warnings** | Move the file into the matching vowel folder or rename it with the `__SYMBOL` pattern, then rescan. |
 | **Generation stopped with an error** | Length policy is set to **Error**, and the resolver could not fill the requested semitones. Change to **Pad** or **Truncate**, or add more samples. |
 | **UI buttons greyed out** | Make sure the Mode toggle is on **Custom** when managing presets and templates. |
 | **Random results change each run** | Provide a Random Seed (Random Mode) or enable seeded selection in your preset. |

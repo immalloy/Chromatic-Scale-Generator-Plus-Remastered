@@ -189,17 +189,21 @@ def detect_symbol(path: Path, allowed_symbols: Iterable[str]) -> SymbolDetection
     if tag_symbol and tag_symbol not in allowed:
         tag_symbol = None
 
-    warning = None
-    if tag_symbol:
-        if folder_symbol and folder_symbol != tag_symbol:
-            warning = (
-                f"Filename tag overrides folder symbol for {path.name}: "
-                f"{tag_symbol} (folder {folder_symbol})"
-            )
-        return SymbolDetection(symbol=tag_symbol, source="tag", warning=warning)
-
     if folder_symbol:
-        return SymbolDetection(symbol=folder_symbol, source="folder", warning=None)
+        warning = None
+        if tag_symbol and tag_symbol != folder_symbol:
+            warning = (
+                f"Folder symbol {folder_symbol} overrides filename tag {tag_symbol} "
+                f"for {path.name}"
+            )
+        return SymbolDetection(symbol=folder_symbol, source="folder", warning=warning)
+
+    if tag_symbol:
+        warning = (
+            f"{path.name} uses filename tag {tag_symbol} but is not inside a vowel folder. "
+            "Move it to a matching folder (e.g. A/sample.wav)."
+        )
+        return SymbolDetection(symbol=None, source="tag-only", warning=warning)
 
     return SymbolDetection(symbol=None, source=None, warning=None)
 
@@ -250,6 +254,9 @@ def scan_symbol_buckets(
         if symbol:
             buckets.setdefault(symbol, []).append(file)
         else:
+            if detection.source == "tag-only":
+                unlabeled.append(file)
+                continue
             match = SYMBOL_TAG_PATTERN.search(file.name)
             if match:
                 sym = match.group("sym").upper()
