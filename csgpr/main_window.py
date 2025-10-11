@@ -29,7 +29,7 @@ from PySide6.QtWidgets import (
     QWidget,
 )
 
-from i18n_pkg import T, list_languages
+from i18n_pkg import T
 
 from .constants import (
     APP_ICON_PATH,
@@ -41,7 +41,7 @@ from .constants import (
     PROJECT_TUTORIAL_URL,
     PROJECT_WIKI_URL,
 )
-from .dialogs import CreditsDialog
+from .dialogs import CreditsDialog, SettingsDialog
 from .generation import GenerateWorker
 from .styles import build_stylesheet
 
@@ -65,8 +65,17 @@ class MainWindow(QMainWindow):
         central = QWidget()
         self.setCentralWidget(central)
 
+        outer = QVBoxLayout(central)
+        outer.setContentsMargins(24, 24, 24, 16)
+        outer.setSpacing(20)
+
         self.cfg_group = QGroupBox(T(self.lang, "Configuration"))
         cfg_layout = QGridLayout(self.cfg_group)
+        cfg_layout.setContentsMargins(16, 20, 16, 16)
+        cfg_layout.setHorizontalSpacing(12)
+        cfg_layout.setVerticalSpacing(10)
+        cfg_layout.setColumnStretch(0, 0)
+        cfg_layout.setColumnStretch(1, 1)
 
         self.path_edit = QLineEdit()
         self.path_edit.setPlaceholderText(
@@ -98,34 +107,11 @@ class MainWindow(QMainWindow):
         self.gap_spin.setSingleStep(0.05)
         self.gap_spin.setValue(0.30)
 
-        self.opt_pitched = QCheckBox(T(self.lang, "Apply pitch transformation"))
-        self.opt_pitched.setChecked(True)
-        self.opt_dump = QCheckBox(T(self.lang, "Dump individual pitched samples"))
-        self.opt_random = QCheckBox(T(self.lang, "Randomize sample selection"))
-        self.opt_normalize = QCheckBox(
-            T(self.lang, "Peak normalize each sample (pre-pitch)")
-        )
-        self.opt_slicex_markers = QCheckBox(
-            T(self.lang, "Embed FL Studio Slicex slice markers")
-        )
-
-        self.mode_combo = QComboBox()
-        self.mode_combo.addItems(["dark", "light"])
-        self.mode_combo.setCurrentText(self.mode)
-
-        self.accent_combo = QComboBox()
-        self.accent_combo.addItems(["blue", "pink"])
-        self.accent_combo.setCurrentText(self.accent)
-
-        self.lang_combo = QComboBox()
-        for code, label in list_languages():
-            self.lang_combo.addItem(label, code)
-        self.lang_combo.setCurrentIndex(self.lang_combo.findData("en"))
-
         row = 0
         self.sample_folder_label = QLabel(T(self.lang, "Sample folder"))
         cfg_layout.addWidget(self.sample_folder_label, row, 0)
         folder_row = QHBoxLayout()
+        folder_row.setSpacing(8)
         folder_row.addWidget(self.path_edit, 1)
         folder_row.addWidget(self.browse_btn, 0)
         cfg_layout.addLayout(folder_row, row, 1)
@@ -152,42 +138,41 @@ class MainWindow(QMainWindow):
         self.gap_label = QLabel(T(self.lang, "Gap (seconds)"))
         cfg_layout.addWidget(self.gap_label, row, 0)
         cfg_layout.addWidget(self.gap_spin, row, 1)
-        row += 1
 
-        cfg_layout.addWidget(self.opt_pitched, row, 0, 1, 2)
-        row += 1
+        self.advanced_group = QGroupBox(T(self.lang, "Advanced Options"))
+        advanced_layout = QVBoxLayout(self.advanced_group)
+        advanced_layout.setContentsMargins(16, 20, 16, 16)
+        advanced_layout.setSpacing(8)
 
-        cfg_layout.addWidget(self.opt_dump, row, 0, 1, 2)
-        row += 1
+        self.opt_pitched = QCheckBox(T(self.lang, "Apply pitch transformation"))
+        self.opt_pitched.setChecked(True)
+        self.opt_dump = QCheckBox(T(self.lang, "Dump individual pitched samples"))
+        self.opt_random = QCheckBox(T(self.lang, "Randomize sample selection"))
+        self.opt_normalize = QCheckBox(
+            T(self.lang, "Peak normalize each sample (pre-pitch)")
+        )
+        self.opt_slicex_markers = QCheckBox(
+            T(self.lang, "Embed FL Studio Slicex slice markers")
+        )
 
-        cfg_layout.addWidget(self.opt_random, row, 0, 1, 2)
-        row += 1
+        for widget in (
+            self.opt_pitched,
+            self.opt_dump,
+            self.opt_random,
+            self.opt_normalize,
+            self.opt_slicex_markers,
+        ):
+            advanced_layout.addWidget(widget)
 
-        cfg_layout.addWidget(self.opt_normalize, row, 0, 1, 2)
-        row += 1
-
-        cfg_layout.addWidget(self.opt_slicex_markers, row, 0, 1, 2)
-        row += 1
-
-        appearance_row = QHBoxLayout()
-        self.theme_label = QLabel(T(self.lang, "Theme:"))
-        appearance_row.addWidget(self.theme_label)
-        appearance_row.addWidget(self.mode_combo)
-        appearance_row.addSpacing(12)
-        self.accent_label = QLabel(T(self.lang, "Accent:"))
-        appearance_row.addWidget(self.accent_label)
-        appearance_row.addWidget(self.accent_combo)
-        appearance_row.addSpacing(12)
-        self.language_label = QLabel(T(self.lang, "Language:"))
-        appearance_row.addWidget(self.language_label)
-        appearance_row.addWidget(self.lang_combo)
-        appearance_row.addStretch(1)
-        cfg_layout.addLayout(appearance_row, row, 0, 1, 2)
+        advanced_layout.addStretch(1)
 
         self.run_group = QGroupBox(T(self.lang, "Run"))
         run_layout = QVBoxLayout(self.run_group)
+        run_layout.setContentsMargins(16, 20, 16, 16)
+        run_layout.setSpacing(12)
 
         btns_row = QHBoxLayout()
+        btns_row.setSpacing(10)
         self.generate_btn = QPushButton(T(self.lang, "Generate Chromatic"))
         self.generate_btn.setEnabled(False)
         self.cancel_btn = QPushButton(T(self.lang, "Cancel"))
@@ -210,8 +195,17 @@ class MainWindow(QMainWindow):
         run_layout.addWidget(self.progress)
         run_layout.addWidget(self.log, 1)
 
+        top_row = QHBoxLayout()
+        top_row.setSpacing(20)
+        top_row.addWidget(self.cfg_group, 2)
+        top_row.addWidget(self.advanced_group, 1)
+        outer.addLayout(top_row, 0)
+        outer.addWidget(self.run_group, 1)
+
         footer_row = QHBoxLayout()
+        footer_row.setSpacing(12)
         self.footer = QLabel(T(self.lang, "Footer"))
+        self.footer.setWordWrap(True)
         self.footer.setObjectName("Footer")
         self.wiki_btn = QPushButton(T(self.lang, "Wiki"))
         self.wiki_btn.setObjectName("LinkButton")
@@ -219,20 +213,49 @@ class MainWindow(QMainWindow):
         self.tutorial_btn.setObjectName("LinkButton")
         self.credits_btn = QPushButton(T(self.lang, "Credits"))
         self.credits_btn.setObjectName("LinkButton")
+        self.settings_footer_btn = QPushButton(T(self.lang, "Settings"))
+        self.settings_footer_btn.setObjectName("LinkButton")
         footer_row.addWidget(self.footer, 1)
         footer_row.addStretch(1)
         footer_row.addWidget(self.wiki_btn, 0)
         footer_row.addWidget(self.tutorial_btn, 0)
         footer_row.addWidget(self.credits_btn, 0)
-
-        outer = QVBoxLayout(central)
-        inner = QHBoxLayout()
-        inner.addWidget(self.cfg_group, 1)
-        inner.addWidget(self.run_group, 1)
-        outer.addLayout(inner, 1)
+        footer_row.addWidget(self.settings_footer_btn, 0)
         outer.addLayout(footer_row)
 
-        help_menu = self.menuBar().addMenu(T(self.lang, "&Help"))
+        self.setStatusBar(QStatusBar())
+        self.apply_theme()
+        self.build_menus()
+
+        self.path_edit.textChanged.connect(self.refresh_validation)
+        self.generate_btn.clicked.connect(self.start_generation)
+        self.cancel_btn.clicked.connect(self.cancel_generation)
+        self.open_out_btn.clicked.connect(self.open_output_folder_clicked)
+        self.wiki_btn.clicked.connect(self.open_wiki)
+        self.tutorial_btn.clicked.connect(self.open_tutorial)
+        self.credits_btn.clicked.connect(self.show_credits)
+        self.settings_footer_btn.clicked.connect(self.open_settings_dialog)
+
+        self.worker: GenerateWorker | None = None
+        self.last_output_path: Path | None = None
+
+        self.setAcceptDrops(True)
+        self.refresh_validation()
+        self.refresh_button_state()
+
+    def apply_theme(self) -> None:
+        self.setStyleSheet(build_stylesheet(self.mode, self.accent))
+
+    def build_menus(self) -> None:
+        menu_bar = self.menuBar()
+        menu_bar.clear()
+
+        settings_menu = menu_bar.addMenu(T(self.lang, "&Settings"))
+        settings_action = QAction(T(self.lang, "Open Settings…"), self)
+        settings_action.triggered.connect(self.open_settings_dialog)
+        settings_menu.addAction(settings_action)
+
+        help_menu = menu_bar.addMenu(T(self.lang, "&Help"))
         act_wiki = QAction(T(self.lang, "Wiki"), self)
         act_wiki.triggered.connect(self.open_wiki)
         help_menu.addAction(act_wiki)
@@ -247,44 +270,10 @@ class MainWindow(QMainWindow):
         act_credits.triggered.connect(self.show_credits)
         help_menu.addAction(act_credits)
 
-        self.setStatusBar(QStatusBar())
-        self.apply_theme()
-
-        self.path_edit.textChanged.connect(self.refresh_validation)
-        self.mode_combo.currentTextChanged.connect(self.on_theme_changed)
-        self.accent_combo.currentTextChanged.connect(self.on_theme_changed)
-        self.lang_combo.currentIndexChanged.connect(self.on_language_changed)
-        self.generate_btn.clicked.connect(self.start_generation)
-        self.cancel_btn.clicked.connect(self.cancel_generation)
-        self.open_out_btn.clicked.connect(self.open_output_folder_clicked)
-        self.wiki_btn.clicked.connect(self.open_wiki)
-        self.tutorial_btn.clicked.connect(self.open_tutorial)
-        self.credits_btn.clicked.connect(self.show_credits)
-
-        self.worker: GenerateWorker | None = None
-        self.last_output_path: Path | None = None
-
-        self.setAcceptDrops(True)
-        self.refresh_validation()
-        self.refresh_button_state()
-
-    def apply_theme(self) -> None:
-        self.setStyleSheet(build_stylesheet(self.mode, self.accent))
-
-    def on_theme_changed(self) -> None:
-        self.mode = self.mode_combo.currentText()
-        self.accent = self.accent_combo.currentText()
-        self.apply_theme()
-
-    def on_language_changed(self) -> None:
-        code = self.lang_combo.currentData()
-        if code and code != self.lang:
-            self.lang = code
-            self.retranslate_all()
-
     def retranslate_all(self) -> None:
         self.setWindowTitle(APP_TITLE)
         self.cfg_group.setTitle(T(self.lang, "Configuration"))
+        self.advanced_group.setTitle(T(self.lang, "Advanced Options"))
         self.run_group.setTitle(T(self.lang, "Run"))
         self.sample_folder_label.setText(T(self.lang, "Sample folder"))
         self.starting_note_label.setText(T(self.lang, "Starting note"))
@@ -307,31 +296,27 @@ class MainWindow(QMainWindow):
         self.generate_btn.setText(T(self.lang, "Generate Chromatic"))
         self.cancel_btn.setText(T(self.lang, "Cancel"))
         self.open_out_btn.setText(T(self.lang, "Open Output Folder"))
-        self.theme_label.setText(T(self.lang, "Theme:"))
-        self.accent_label.setText(T(self.lang, "Accent:"))
-        self.language_label.setText(T(self.lang, "Language:"))
         self.wiki_btn.setText(T(self.lang, "Wiki"))
         self.tutorial_btn.setText(T(self.lang, "Tutorial"))
         self.credits_btn.setText(T(self.lang, "Credits"))
+        self.settings_footer_btn.setText(T(self.lang, "Settings"))
         self.footer.setText(T(self.lang, "Footer"))
 
-        self.menuBar().clear()
-        help_menu = self.menuBar().addMenu(T(self.lang, "&Help"))
-        act_wiki = QAction(T(self.lang, "Wiki"), self)
-        act_wiki.triggered.connect(self.open_wiki)
-        help_menu.addAction(act_wiki)
-
-        act_tutorial = QAction(T(self.lang, "Tutorial"), self)
-        act_tutorial.triggered.connect(self.open_tutorial)
-        help_menu.addAction(act_tutorial)
-
-        help_menu.addSeparator()
-
-        act_credits = QAction(T(self.lang, "Credits"), self)
-        act_credits.triggered.connect(self.show_credits)
-        help_menu.addAction(act_credits)
+        self.build_menus()
 
         self.refresh_validation()
+
+    def open_settings_dialog(self) -> None:
+        dialog = SettingsDialog(self.lang, self.mode, self.accent, self)
+        if dialog.exec():
+            mode, accent, lang = dialog.values()
+            if mode != self.mode or accent != self.accent:
+                self.mode = mode
+                self.accent = accent
+                self.apply_theme()
+            if lang != self.lang:
+                self.lang = lang
+                self.retranslate_all()
 
     def dragEnterEvent(self, event) -> None:  # type: ignore[override]
         if event.mimeData().hasUrls():

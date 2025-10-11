@@ -60,9 +60,37 @@ PALETTES: dict[PaletteKey, Palette] = {
 }
 
 
+def _encode_color(color: str) -> str:
+    """Return a hex colour suitable for embedding in data URIs."""
+
+    return color.replace("#", "%23")
+
+
 def build_stylesheet(mode: str, accent: str) -> str:
     palette = PALETTES[(mode, accent)]
     highlight_text = "white" if mode == "dark" else palette["text"]
+    arrow_color = _encode_color(palette["accent"])
+    arrow_disabled = _encode_color(palette["border"])
+    down_arrow = (
+        "data:image/svg+xml;utf8," +
+        f"<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'>"
+        f"<path fill='{arrow_color}' d='M1 1.5L6 6.5L11 1.5Z'/></svg>"
+    )
+    down_arrow_disabled = (
+        "data:image/svg+xml;utf8," +
+        f"<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'>"
+        f"<path fill='{arrow_disabled}' d='M1 1.5L6 6.5L11 1.5Z'/></svg>"
+    )
+    up_arrow = (
+        "data:image/svg+xml;utf8," +
+        f"<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'>"
+        f"<path fill='{arrow_color}' d='M1 6.5L6 1.5L11 6.5Z'/></svg>"
+    )
+    up_arrow_disabled = (
+        "data:image/svg+xml;utf8," +
+        f"<svg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'>"
+        f"<path fill='{arrow_disabled}' d='M1 6.5L6 1.5L11 6.5Z'/></svg>"
+    )
     return f"""
         QMainWindow {{ background: {palette['bg']}; }}
         QWidget {{ color: {palette['text']}; }}
@@ -94,6 +122,12 @@ def build_stylesheet(mode: str, accent: str) -> str:
             selection-background-color: {palette['accent2']};
             selection-color: {highlight_text};
         }}
+        QComboBox {{
+            padding-right: 40px;
+        }}
+        QSpinBox, QDoubleSpinBox {{
+            padding-right: 36px;
+        }}
         QLineEdit:focus, QSpinBox:focus, QDoubleSpinBox:focus, QComboBox:focus, QTextEdit:focus, QPlainTextEdit:focus {{
             border: 1px solid {palette['accent']};
         }}
@@ -103,6 +137,52 @@ def build_stylesheet(mode: str, accent: str) -> str:
             color: {palette['text']};
             selection-background-color: {palette['accent2']};
             selection-color: {highlight_text};
+        }}
+        QComboBox::drop-down {{
+            subcontrol-origin: padding;
+            subcontrol-position: top right;
+            width: 32px;
+            border: none;
+            background: transparent;
+        }}
+        QComboBox::down-arrow {{
+            image: url({down_arrow});
+            width: 12px;
+            height: 8px;
+            margin-right: 8px;
+        }}
+        QComboBox::down-arrow:disabled {{
+            image: url({down_arrow_disabled});
+        }}
+        QSpinBox::up-button, QDoubleSpinBox::up-button {{
+            subcontrol-origin: border;
+            subcontrol-position: top right;
+            width: 28px;
+            border-left: 1px solid {palette['border']};
+            background: transparent;
+        }}
+        QSpinBox::down-button, QDoubleSpinBox::down-button {{
+            subcontrol-origin: border;
+            subcontrol-position: bottom right;
+            width: 28px;
+            border-left: 1px solid {palette['border']};
+            background: transparent;
+        }}
+        QSpinBox::up-arrow, QDoubleSpinBox::up-arrow {{
+            image: url({up_arrow});
+            width: 12px;
+            height: 8px;
+        }}
+        QSpinBox::up-arrow:disabled, QDoubleSpinBox::up-arrow:disabled {{
+            image: url({up_arrow_disabled});
+        }}
+        QSpinBox::down-arrow, QDoubleSpinBox::down-arrow {{
+            image: url({down_arrow});
+            width: 12px;
+            height: 8px;
+        }}
+        QSpinBox::down-arrow:disabled, QDoubleSpinBox::down-arrow:disabled {{
+            image: url({down_arrow_disabled});
         }}
         QPushButton {{
             background: {palette['accent']};
