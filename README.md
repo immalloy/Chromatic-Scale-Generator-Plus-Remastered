@@ -150,6 +150,7 @@ You can easily add new ones — just copy a file from `i18n_pkg/` and translate 
 | 🇮🇩 Translator Indonesian | **MTGC** |
 
 Join our Discord!
+
 [![Discord](https://img.shields.io/badge/Join%20Discord-FNF%20Modding-7289da?style=for-the-badge\&logo=discord)](https://discord.gg/pe6J4FbcCU)
 
 We share chromatics, FNF tools, tutorials, and modding fun!
