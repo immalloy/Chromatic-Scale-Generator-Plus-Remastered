@@ -9,7 +9,8 @@
       "show_title_panel": false,
       "show_credits_panel": true,
       "dim_background": false,
-      "show_decorations": false
+      "show_decorations": false,
+      "artists": ["SirTheGamerCoder"]
     }
   ]
 }

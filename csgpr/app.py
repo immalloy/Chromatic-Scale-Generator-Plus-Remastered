@@ -6,7 +6,7 @@ import json
 import os
 import random
 import sys
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -48,6 +48,7 @@ class SplashVisuals:
     show_credits_panel: bool = True
     dim_background: bool = True
     show_decorations: bool = True
+    artists: list[str] = field(default_factory=list)
 
 
 def main() -> None:
@@ -60,7 +61,11 @@ def main() -> None:
         APP_ICON_PATH,
         T(splash_lang, "SplashTitle"),
         T(splash_lang, "SplashSubtitle"),
-        T(splash_lang, "SplashCredits"),
+        _compose_splash_credits(
+            splash_lang,
+            T(splash_lang, "SplashCredits"),
+            visuals.artists,
+        ),
         visuals,
     )
     splash = QSplashScreen(splash_pixmap)
@@ -138,6 +143,7 @@ def _load_splash_variants(config_path: Path) -> list[SplashVisuals]:
                 ),
                 dim_background=_parse_bool(entry.get("dim_background"), True),
                 show_decorations=_parse_bool(entry.get("show_decorations"), True),
+                artists=_parse_artists(entry.get("artists")),
             )
         )
 
@@ -170,6 +176,24 @@ def _parse_bool(value: Any, default: bool) -> bool:
     return default
 
 
+def _parse_artists(value: Any) -> list[str]:
+    """Return a list of artist names parsed from ``value``."""
+
+    if isinstance(value, list):
+        names = [item.strip() for item in value if isinstance(item, str)]
+    elif isinstance(value, str):
+        stripped = value.strip()
+        names = [stripped] if stripped else []
+    else:
+        names = []
+
+    seen: dict[str, None] = {}
+    for name in names:
+        if name and name not in seen:
+            seen[name] = None
+    return list(seen.keys())
+
+
 def _resolve_art_path(path: str | None) -> str | None:
     """Return a string path if the file exists on disk."""
 
@@ -179,6 +203,22 @@ def _resolve_art_path(path: str | None) -> str | None:
     if candidate.exists():
         return str(candidate)
     return None
+
+
+def _compose_splash_credits(
+    lang: str, base_credits: str, artists: list[str]
+) -> str:
+    """Append splash artist information to the credits block when available."""
+
+    if not artists:
+        return base_credits
+
+    template = T(lang, "SplashCreditsArtists")
+    names = ", ".join(artists)
+    artists_block = template.format(artists=names) if "{artists}" in template else template
+    if base_credits.strip():
+        return f"{base_credits}\n{artists_block}"
+    return artists_block
 
 
 def _build_splash_pixmap(
@@ -196,6 +236,11 @@ def _build_splash_pixmap(
 
     painter = QPainter(pixmap)
     painter.setRenderHint(QPainter.Antialiasing)
+
+    clip_radius = min(size.width(), size.height()) * 0.04
+    clip_path = QPainterPath()
+    clip_path.addRoundedRect(pixmap.rect(), clip_radius, clip_radius)
+    painter.setClipPath(clip_path)
 
     art = QPixmap(visuals.art_path) if visuals.art_path else QPixmap()
     if not art.isNull():
