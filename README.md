@@ -85,26 +85,26 @@ python CSGPR.py
 
 ## 🧱 Building a Standalone App
 
-For Windows:
+For Windows run:
 
 ```
-build_chromatic_plus.bat
+build_CSGPR.bat
 ```
 
-This script installs everything needed, then builds a **standalone EXE** with your icon.
-When finished, your app will be inside:
+The script creates/uses `.venv_build`, installs the dependencies, then freezes the app with PyInstaller.
+By default it produces an easy-to-distribute folder build at:
 
 ```
-dist\chromatic_gen_qt_plus_modular_i18n\
+dist\CSGPR\
 ```
 
-If it doesn’t open, use:
+Need a single EXE instead? Pass `--onefile`:
 
 ```
-run_with_logs.bat
+build_CSGPR.bat --onefile
 ```
 
-to view error logs safely.
+Use `run_with_logs.bat` if you want to launch the unfrozen app and capture console output for debugging.
 
 ---
 
