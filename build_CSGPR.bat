@@ -70,7 +70,7 @@ echo  Chromatic Scale Generator PLUS! - Build
 if /I "%BUILD_MODE%"=="onefile" (
   echo  Mode: single-file executable
 ) else (
-  echo  Mode: onedir (recommended)
+  echo  Mode: onedir (recommended^)
 )
 echo ================================================================
 
@@ -117,7 +117,7 @@ if not defined PYTHON_CMD (
   goto finalize
 )
 
-for /f "usebackq tokens=1,2 delims=." %%a in (`"%PYTHON_CMD%" -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')"`) do (
+for /f "tokens=1,2 delims=." %%a in ('%PYTHON_CMD% -c "import sys; print(\"{}.{}\".format(sys.version_info.major, sys.version_info.minor))"') do (
   set "PY_MAJOR=%%a"
   set "PY_MINOR=%%b"
 )
