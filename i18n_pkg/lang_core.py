@@ -15,7 +15,7 @@ from .lang_ru import STRINGS as ru
 from .lang_ja import STRINGS as ja
 from .lang_fr import STRINGS as fr
 from .lang_ko import STRINGS as ko
-
+from .lang_id import STRINGS as id
 
 # Register languages here
 LANGS: Dict[str, Dict[str, str]] = {
@@ -29,6 +29,7 @@ LANGS: Dict[str, Dict[str, str]] = {
     "ja": ja,
     "fr": fr,
     "ko": ko,
+    "id": id,
 }
 
 # Human-friendly names for dropdowns
@@ -43,6 +44,7 @@ NAMES: Dict[str, str] = {
     "ja": "日本語 (Japanese)",
     "fr": "Français (French)",
     "ko": "한국어 (Korean)",
+    "id": "Indonesia (Indonesian)"
 }
 
 def list_languages():
