@@ -117,9 +117,11 @@ if not defined PYTHON_CMD (
   goto finalize
 )
 
-for /f "tokens=1,2 delims=." %%a in ('%PYTHON_CMD% -c "import sys; print(\"{}.{}\".format(sys.version_info.major, sys.version_info.minor))"') do (
+for /f "tokens=1" %%a in ('%PYTHON_CMD% -c "import sys; print(sys.version_info.major)"') do (
   set "PY_MAJOR=%%a"
-  set "PY_MINOR=%%b"
+)
+for /f "tokens=1" %%a in ('%PYTHON_CMD% -c "import sys; print(sys.version_info.minor)"') do (
+  set "PY_MINOR=%%a"
 )
 if not defined PY_MAJOR (
   echo [ERROR] Unable to detect Python version from %PYTHON_CMD%.
