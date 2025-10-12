@@ -58,4 +58,5 @@ STRINGS = {
     "SplashTitle": "Skala Kromatik Generator Plus Remastered",
     "SplashSubtitle": "",
     "SplashCredits": "Kredit: @ChillSpaceIRL • @nullfreq_ • Malloy",
+    "SplashCreditsArtists": "Seni splash oleh {artists}",
 }
