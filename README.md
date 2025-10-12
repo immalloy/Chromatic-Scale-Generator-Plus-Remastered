@@ -8,7 +8,7 @@
 
 *Stuff is still being fixed btw :D*
 
-![Version](https://img.shields.io/badge/version-3.1.3-pink?style=for-the-badge)
+![Version](https://img.shields.io/badge/version-4.0.0--beta-pink?style=for-the-badge)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge\&logo=python)
 ![License](https://img.shields.io/badge/License-GPLv3-green?style=for-the-badge)
 ![Build](https://img.shields.io/badge/Build-PyInstaller-lightgrey?style=for-the-badge)

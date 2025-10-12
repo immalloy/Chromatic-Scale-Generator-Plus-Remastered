@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Dict, List
 
-APP_VERSION: str = "3.1.3"
+APP_VERSION: str = "4.0.0-beta"
 RELEASE_YEAR: int = 2025 #cmon how did i forget THIS
 RELEASE_MONTH: int = 10  # October, I forgot shit
 
