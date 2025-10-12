@@ -122,6 +122,7 @@ to view error logs safely.
 | Русский (Russian)  | lang_ru.py | ✅      |
 | Français (French)  | lang_fr.py | ✅      |
 | বাংলা (Bengali)    | lang_bn.py | ✅      |
+| Indonesia (Indonesian)    | lang_id.py | ✅      |
 
 You can easily add new ones — just copy a file from `i18n_pkg/` and translate the strings.
 
@@ -146,6 +147,7 @@ You can easily add new ones — just copy a file from `i18n_pkg/` and translate 
 | 🧩 Original Tool  | **ChillSpaceIRL** |
 | 🔄 First Remaster | **nullfrequency** |
 | 🎨 Modern Edition | **Malloy (me!)** |
+| 🇮🇩 Translator Indonesian | **MTGC** |
 
 Join our Discord!
 [![Discord](https://img.shields.io/badge/Join%20Discord-FNF%20Modding-7289da?style=for-the-badge\&logo=discord)](https://discord.gg/pe6J4FbcCU)
@@ -172,7 +174,7 @@ See [LICENSE](LICENSE) for the full terms.
 ✅ Multilingual interface
 ✅ Threaded “Cancel” button
 ✅ Unified dialogs
-🕒 Add splash screen
+✅ Add splash screen
 🕒 macOS / Linux compatibility
 
 ---
