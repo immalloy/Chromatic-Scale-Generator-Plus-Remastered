@@ -36,5 +36,6 @@ PROJECT_TUTORIAL_URL = (
     "https://github.com/immalloy/Chromatic-Scale-Generator-Plus-Remastered/wiki/Tutorial"
 )
 SPLASH_SIZE = QSize(1280, 720)
-SPLASH_ART_PATH = str(_base_dir() / "assets" / "splash.png")
+SPLASH_ART_PATH = str(_base_dir() / "assets" / "sirthegamercodersplash.png")
+SPLASH_CONFIG_PATH = str(_base_dir() / "assets" / "splashes.json")
 SPLASH_MIN_DURATION_MS = 2500
