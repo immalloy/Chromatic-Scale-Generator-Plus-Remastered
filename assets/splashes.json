@@ -2,14 +2,14 @@
   "splashes": [
     {
       "file": "sirthegamercodersplash.png",
-      "show_title": true,
-      "show_subtitle": true,
-      "show_icon": true,
+      "show_title": false,
+      "show_subtitle": false,
+      "show_icon": false,
       "show_credits": true,
-      "show_title_panel": true,
+      "show_title_panel": false,
       "show_credits_panel": true,
-      "dim_background": true,
-      "show_decorations": true
+      "dim_background": false,
+      "show_decorations": false
     }
   ]
 }
