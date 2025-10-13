@@ -43,7 +43,7 @@ STRINGS = {
     "Done! Saved to {p}": "Selesai! Disimpan ke {p}",
     "An error occurred.": "Terjadi kesalahan.",
     "⚠️ Generation was cancelled.": "⚠️ Generasi dibatalkan.",
-    "Footer": "Alat asli oleh @ChillSpaceIRL • Remastered oleh @nullfreq_ dan Malloy  |  Versi {version} • {month_name} {year}",
+    "Footer": "Alat asli oleh @ChillSpaceIRL • Remastered oleh @nullfreq_ dan Malloy | Versi {version} • {month_name} {year}",
     "Join Discord": "Bergabung di Discord",
     "CreditsText": "Skala Kromatik Generator Plus Remastered\n\nAlat asli oleh @ChillSpaceIRL\nRemastered oleh @nullfreq_ dan Malloy\nVersi {version} • {month_name} {year}\n\nTerima kasih telah menggunakan aplikasi!",
     "Found {n} sample(s) (1.wav..{m}.wav).": "Ditemukan {n} sampel (1.wav..{m}.wav).",
@@ -55,7 +55,4 @@ STRINGS = {
     "Embedding FL Studio Slicex slice markers...": "Menyematkan penanda slice FL Studio Slicex...",
     "Saved: {path}": "Disimpan: {path}",
     "Dumped {n} pitched sample(s) to: {dir}": "Membuang {n} sampel bernada ke: {dir}",
-    "SplashTitle": "Skala Kromatik Generator Plus Remastered",
-    "SplashSubtitle": "",
-    "SplashCredits": "Kredit: @ChillSpaceIRL • @nullfreq_ • Malloy",
 }

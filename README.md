@@ -172,7 +172,6 @@ See [LICENSE](LICENSE) for the full terms.
 ✅ Multilingual interface
 ✅ Threaded “Cancel” button
 ✅ Unified dialogs
-🕒 Add splash screen
 🕒 macOS / Linux compatibility
 
 ---

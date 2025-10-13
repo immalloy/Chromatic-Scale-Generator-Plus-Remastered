@@ -45,7 +45,7 @@ STRINGS = {
     "An error occurred.": "Ocorreu um erro.",
     "⚠️ Generation was cancelled.": "⚠️ A geração foi cancelada.",
 
-    "Footer": "Ferramenta original de @ChillSpaceIRL • Remasterizado por @nullfreq_ e Malloy  |  Versão {version} • {month_name} de {year}",
+    "Footer": "Ferramenta original de @ChillSpaceIRL • Remasterizado por @nullfreq_ e Malloy | Versão {version} • {month_name} de {year}",
     "Join Discord": "Entrar no Discord",
     "CreditsText": "Chromatic Scale Generator Plus Remastered\n\nFerramenta original: @ChillSpaceIRL\nRemasterizado por: @nullfreq_ e Malloy\nVersão {version} • {month_name} de {year}\n\nObrigado por usar o app!",
 
