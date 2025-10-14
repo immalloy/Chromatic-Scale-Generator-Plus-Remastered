@@ -88,10 +88,11 @@ python CSGPR.py
 For Windows:
 
 ```
-build_chromatic_plus.bat
+build_CSGPR.bat
 ```
 
 This script installs everything needed, then builds a **standalone EXE** with your icon.
+Every run now drops a timestamped log inside `logs/` (for example, `logs/build_20250101_120000.log`) so you can share detailed output if a build crashes.
 When finished, your app will be inside:
 
 ```
