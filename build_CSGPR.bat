@@ -104,14 +104,13 @@ call :log "[4/5] Building (onedir, windowed, no UPX)..."
 set "PYI_ARGS=--noconfirm --clean --windowed --noupx --name CSGPR --collect-all numpy --collect-all parselmouth --collect-all i18n_pkg --collect-all csgpr"
 set "OPTIONAL_ASSET_FLAG="
 if exist "assets" (
-  set "PYI_ARGS=!PYI_ARGS! --add-data \"assets;assets\""
+  set "PYI_ARGS=!PYI_ARGS! --add-data assets;assets"
   set "OPTIONAL_ASSET_FLAG= --add-data \"assets;assets\""
   call :log "[INFO] Bundling assets directory."
 ) else (
   call :log "[INFO] Optional assets directory not found; continuing without it."
 )
-set "PYI_ARGS=!PYI_ARGS! --add-data \"icon.ico;.\" --icon=\"%ICON%\" \"%APP%\""
-pyinstaller !PYI_ARGS! >> "%LOG_FILE%" 2>&1
+pyinstaller !PYI_ARGS! --add-data "icon.ico;." --icon="%ICON%" "%APP%" >> "%LOG_FILE%" 2>&1
 if errorlevel 1 (
   set "ERR=%ERRORLEVEL%"
   call :log "[ERROR] Build failed (exit code !ERR!)."
