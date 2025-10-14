@@ -49,6 +49,11 @@ STRINGS = {
     "Footer": "オリジナル: @ChillSpaceIRL • リマスター: @nullfreq_ と Malloy | バージョン {version} • {year}年{month_number}月",
     "Join Discord": "Discord に参加",
     "CreditsText": "Chromatic Scale Generator Plus Remastered\n\nオリジナル: @ChillSpaceIRL\nリマスター: @nullfreq_ と Malloy\nバージョン {version} • {year}年{month_number}月\n\nご利用ありがとうございます!",
+    "CreditsTabAbout": "概要",
+    "CreditsTabContributors": "貢献者",
+    "CreditsContributorsLoading": "貢献者を読み込み中…",
+    "CreditsContributorsNone": "貢献者が見つかりませんでした。",
+    "CreditsContributorsError": "貢献者を読み込めませんでした。",
 
     "Found {n} sample(s) (1.wav..{m}.wav).": "{n} 個のサンプルを見つけました(1.wav..{m}.wav)。",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "半音: {s} | 間隔: {g:.3f}秒 | ピッチ変更: {p}",
