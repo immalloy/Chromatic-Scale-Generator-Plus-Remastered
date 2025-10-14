@@ -88,14 +88,15 @@ python CSGPR.py
 For Windows:
 
 ```
-build_chromatic_plus.bat
+build_CSGPR.bat
 ```
 
 This script installs everything needed, then builds a **standalone EXE** with your icon.
+Every run now drops a timestamped log inside `logs/` (for example, `logs/build_20250101_120000.log`) so you can share detailed output if a build crashes.
 When finished, your app will be inside:
 
 ```
-dist\chromatic_gen_qt_plus_modular_i18n\
+dist\CSGPR\
 ```
 
 If it doesn’t open, use:
@@ -105,6 +106,8 @@ run_with_logs.bat
 ```
 
 to view error logs safely.
+
+> **Tip:** The build script automatically bundles an `assets` folder when it exists. If you don’t ship extra resources, the step is skipped and the build continues with a helpful log message.
 
 ---
 
@@ -172,7 +175,6 @@ See [LICENSE](LICENSE) for the full terms.
 ✅ Multilingual interface
 ✅ Threaded “Cancel” button
 ✅ Unified dialogs
-🕒 Add splash screen
 🕒 macOS / Linux compatibility
 
 ---

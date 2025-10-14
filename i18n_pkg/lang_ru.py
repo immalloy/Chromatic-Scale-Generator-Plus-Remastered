@@ -46,9 +46,9 @@ STRINGS = {
     "An error occurred.": "Произошла ошибка.",
     "⚠️ Generation was cancelled.": "⚠️ Создание отменено.",
 
-    "Footer": "Оригинал: @ChillSpaceIRL - Ремастер: @nullfreq_ и Malloy  |  Версия {version} - {month_name} {year}",
+    "Footer": "Оригинал: @ChillSpaceIRL • Ремастер: @nullfreq_ и Malloy | Версия {version} • {month_name} {year}",
     "Join Discord": "Вступить в Discord",
-    "CreditsText": "Chromatic Scale Generator Plus Remastered\n\nОригинал: @ChillSpaceIRL\nРемастер: @nullfreq_ и Malloy\nВерсия {version} - {month_name} {year}\n\nСпасибо за использование!",
+    "CreditsText": "Chromatic Scale Generator Plus Remastered\n\nОригинал: @ChillSpaceIRL\nРемастер: @nullfreq_ и Malloy\nВерсия {version} • {month_name} {year}\n\nСпасибо за использование!",
 
     "Found {n} sample(s) (1.wav..{m}.wav).": "Найдено {n} сэмплов (1.wav..{m}.wav).",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "Полутонов: {s} | Пауза: {g:.3f}с | Изменение тона: {p}",
