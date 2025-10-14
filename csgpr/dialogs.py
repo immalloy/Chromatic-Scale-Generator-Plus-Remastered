@@ -2,8 +2,10 @@ from __future__ import annotations
 
 """Standalone Qt dialogs used by the application."""
 
+import json
 import subprocess
 from pathlib import Path
+from typing import Iterable
 
 from PySide6.QtCore import QUrl, Qt
 from PySide6.QtGui import QDesktopServices
@@ -105,6 +107,89 @@ class CreditsDialog(QDialog):
             )
 
     def _fetch_contributors(self) -> tuple[list[str], bool]:
+        contributors, github_error = self._fetch_contributors_from_github()
+        if contributors:
+            return contributors, False
+
+        git_contributors, git_error = self._fetch_contributors_from_git()
+        if git_contributors:
+            return git_contributors, False
+
+        return [], github_error or git_error
+
+    def _fetch_contributors_from_github(self) -> tuple[list[str], bool]:
+        from urllib.error import HTTPError, URLError
+        from urllib.request import Request, urlopen
+
+        url = (
+            "https://api.github.com/repos/"
+            "immalloy/Chromatic-Scale-Generator-Plus-Remastered/contributors"
+            "?per_page=100&anon=1"
+        )
+        headers = {
+            "Accept": "application/vnd.github+json",
+            "User-Agent": "Chromatic-Scale-Generator-Plus-Remastered",
+        }
+        contributors: list[str] = []
+        seen: set[str] = set()
+
+        try:
+            while url:
+                request = Request(url, headers=headers)
+                with urlopen(request, timeout=10) as response:
+                    if response.status != 200:
+                        return [], True
+
+                    payload = json.loads(response.read().decode("utf-8"))
+                    contributors.extend(
+                        self._normalize_contributor_entries(payload, seen)
+                    )
+
+                    url = self._next_link_from_headers(response.headers.get("Link"))
+        except (HTTPError, URLError, TimeoutError, json.JSONDecodeError):
+            return [], True
+
+        return contributors, False
+
+    def _next_link_from_headers(self, link_header: str | None) -> str | None:
+        if not link_header:
+            return None
+        for part in link_header.split(","):
+            section = part.strip()
+            if not section:
+                continue
+            if ";" not in section:
+                continue
+            url_part, rel_part = section.split(";", 1)
+            if 'rel="next"' in rel_part:
+                url_part = url_part.strip()
+                if url_part.startswith("<") and url_part.endswith(">"):
+                    return url_part[1:-1]
+        return None
+
+    def _normalize_contributor_entries(
+        self, entries: Iterable[dict], seen: set[str]
+    ) -> list[str]:
+        normalized: list[str] = []
+        for entry in entries:
+            if not isinstance(entry, dict):
+                continue
+            login = entry.get("login")
+            display = (
+                login
+                or entry.get("name")
+                or entry.get("email")
+                or entry.get("type")
+            )
+            if not display:
+                continue
+            if display in seen:
+                continue
+            seen.add(display)
+            normalized.append(display)
+        return normalized
+
+    def _fetch_contributors_from_git(self) -> tuple[list[str], bool]:
         repo_root = Path(__file__).resolve().parent.parent
         try:
             result = subprocess.run(
