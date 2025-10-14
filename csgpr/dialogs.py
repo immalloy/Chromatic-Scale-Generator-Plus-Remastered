@@ -2,6 +2,9 @@ from __future__ import annotations
 
 """Standalone Qt dialogs used by the application."""
 
+import subprocess
+from pathlib import Path
+
 from PySide6.QtCore import QUrl, Qt
 from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import (
@@ -10,6 +13,8 @@ from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
     QPushButton,
+    QTabWidget,
+    QTextEdit,
     QVBoxLayout,
     QWidget,
 )
@@ -30,7 +35,16 @@ class CreditsDialog(QDialog):
 
         layout = QVBoxLayout(self)
 
-        layout.addWidget(self._build_developers_section())
+        tabs = QTabWidget(self)
+        tabs.addTab(
+            self._build_developers_section(),
+            T(self.lang, "CreditsTabAbout"),
+        )
+        tabs.addTab(
+            self._build_contributors_section(),
+            T(self.lang, "CreditsTabContributors"),
+        )
+        layout.addWidget(tabs)
 
         button_box = QDialogButtonBox(QDialogButtonBox.Ok)
         button_box.accepted.connect(self.accept)
@@ -55,3 +69,66 @@ class CreditsDialog(QDialog):
         section_layout.addLayout(buttons_row)
         section_layout.addStretch(1)
         return widget
+
+    def _build_contributors_section(self) -> QWidget:
+        widget = QWidget(self)
+        section_layout = QVBoxLayout(widget)
+
+        self.contributors_status = QLabel(T(self.lang, "CreditsContributorsLoading"))
+        self.contributors_status.setWordWrap(True)
+        section_layout.addWidget(self.contributors_status)
+
+        self.contributors_text = QTextEdit(self)
+        self.contributors_text.setReadOnly(True)
+        self.contributors_text.setLineWrapMode(QTextEdit.NoWrap)
+        self.contributors_text.setVisible(False)
+        section_layout.addWidget(self.contributors_text)
+
+        section_layout.addStretch(1)
+
+        self._populate_contributors()
+        return widget
+
+    def _populate_contributors(self) -> None:
+        contributors, errored = self._fetch_contributors()
+        if contributors:
+            self.contributors_status.setVisible(False)
+            self.contributors_text.setPlainText("\n".join(contributors))
+            self.contributors_text.setVisible(True)
+        elif errored:
+            self.contributors_status.setText(
+                T(self.lang, "CreditsContributorsError")
+            )
+        else:
+            self.contributors_status.setText(
+                T(self.lang, "CreditsContributorsNone")
+            )
+
+    def _fetch_contributors(self) -> tuple[list[str], bool]:
+        repo_root = Path(__file__).resolve().parent.parent
+        try:
+            result = subprocess.run(
+                [
+                    "git",
+                    "-C",
+                    str(repo_root),
+                    "shortlog",
+                    "-sne",
+                    "HEAD",
+                ],
+                capture_output=True,
+                check=True,
+                text=True,
+            )
+        except (FileNotFoundError, subprocess.CalledProcessError, OSError):
+            return [], True
+
+        lines = [line.strip() for line in result.stdout.splitlines() if line.strip()]
+        contributors: list[str] = []
+        for line in lines:
+            if "\t" in line:
+                _, value = line.split("\t", 1)
+                contributors.append(value)
+            else:
+                contributors.append(line)
+        return contributors, False

@@ -49,6 +49,11 @@ STRINGS = {
     "Footer": "原作者: @ChillSpaceIRL • 重制: @nullfreq_ 与 Malloy | 版本 {version} • {year}年{month_number}月",
     "Join Discord": "加入 Discord",
     "CreditsText": "Chromatic Scale Generator Plus Remastered\n\n原作者: @ChillSpaceIRL\n重制: @nullfreq_ 与 Malloy\n版本 {version} • {year}年{month_number}月\n\n感谢使用!",
+    "CreditsTabAbout": "关于",
+    "CreditsTabContributors": "贡献者",
+    "CreditsContributorsLoading": "正在加载贡献者…",
+    "CreditsContributorsNone": "未找到贡献者。",
+    "CreditsContributorsError": "无法加载贡献者。",
 
     "Found {n} sample(s) (1.wav..{m}.wav).": "找到 {n} 个样本(1.wav..{m}.wav)。",
     "Semitones: {s} | Gap: {g:.3f}s | Pitched: {p}": "半音数: {s} | 间隔: {g:.3f}秒 | 变调: {p}",
