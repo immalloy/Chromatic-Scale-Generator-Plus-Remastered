@@ -56,11 +56,11 @@ if not exist ".venv_build" (
   py -3 -m venv .venv_build >> "%LOG_FILE%" 2>&1
   if errorlevel 1 (
     set "ERR=%ERRORLEVEL%"
-    call :log "[WARN] py -3 failed with exit code %ERR%. Falling back to python -m venv..."
+    call :log "[WARN] py -3 failed with exit code !ERR!. Falling back to python -m venv..."
     python -m venv .venv_build >> "%LOG_FILE%" 2>&1
     if errorlevel 1 (
       set "ERR=%ERRORLEVEL%"
-      call :log "[ERROR] Failed to create virtual environment (exit code %ERR%)."
+      call :log "[ERROR] Failed to create virtual environment (exit code !ERR!)."
       goto :fail
     )
   )
@@ -73,7 +73,7 @@ call :log "[2/5] Activating virtual environment"
 call ".venv_build\Scripts\activate.bat" >> "%LOG_FILE%" 2>&1
 if errorlevel 1 (
   set "ERR=%ERRORLEVEL%"
-  call :log "[ERROR] Failed to activate virtual environment (exit code %ERR%)."
+  call :log "[ERROR] Failed to activate virtual environment (exit code !ERR!)."
   goto :fail
 )
 
@@ -84,7 +84,7 @@ call :log "[2.1] Upgrading pip/setuptools/wheel"
 python -m pip install --upgrade pip setuptools wheel >> "%LOG_FILE%" 2>&1
 if errorlevel 1 (
   set "ERR=%ERRORLEVEL%"
-  call :log "[ERROR] Failed to upgrade packaging tools (exit code %ERR%)."
+  call :log "[ERROR] Failed to upgrade packaging tools (exit code !ERR!)."
   goto :fail
 )
 
@@ -96,23 +96,25 @@ if exist "requirements.txt" (
 )
 if errorlevel 1 (
   set "ERR=%ERRORLEVEL%"
-  call :log "[ERROR] Dependency installation failed (exit code %ERR%)."
+  call :log "[ERROR] Dependency installation failed (exit code !ERR!)."
   goto :fail
 )
 
 call :log "[4/5] Building (onedir, windowed, no UPX)..."
-pyinstaller --noconfirm --clean --windowed --noupx ^
-  --name CSGPR ^
-  --collect-all numpy ^
-  --collect-all parselmouth ^
-  --collect-all i18n_pkg ^
-  --collect-all csgpr ^
-  --add-data "assets;assets" ^
-  --add-data "icon.ico;." ^
-  --icon="%ICON%" "%APP%" >> "%LOG_FILE%" 2>&1
+set "PYI_ARGS=--noconfirm --clean --windowed --noupx --name CSGPR --collect-all numpy --collect-all parselmouth --collect-all i18n_pkg --collect-all csgpr"
+set "OPTIONAL_ASSET_FLAG="
+if exist "assets" (
+  set "PYI_ARGS=!PYI_ARGS! --add-data \"assets;assets\""
+  set "OPTIONAL_ASSET_FLAG= --add-data \"assets;assets\""
+  call :log "[INFO] Bundling assets directory."
+) else (
+  call :log "[INFO] Optional assets directory not found; continuing without it."
+)
+set "PYI_ARGS=!PYI_ARGS! --add-data \"icon.ico;.\" --icon=\"%ICON%\" \"%APP%\""
+pyinstaller !PYI_ARGS! >> "%LOG_FILE%" 2>&1
 if errorlevel 1 (
   set "ERR=%ERRORLEVEL%"
-  call :log "[ERROR] Build failed (exit code %ERR%)."
+  call :log "[ERROR] Build failed (exit code !ERR!)."
   goto :fail
 )
 
@@ -124,7 +126,7 @@ call :log "  dist\CSGPR\CSGPR.exe"
 call :log "Build log saved to: %LOG_FILE%"
 call :log ""
 call :log "[Optional] Build single-file EXE (may trigger more antivirus flags):"
-call :log "  pyinstaller --noconfirm --clean --onefile --windowed --noupx --name CSGPR --collect-all numpy --collect-all parselmouth --collect-all i18n_pkg --collect-all csgpr --add-data \"assets;assets\" --add-data \"icon.ico;.\" --icon=\"%ICON%\" \"%APP%\""
+call :log "  pyinstaller --noconfirm --clean --onefile --windowed --noupx --name CSGPR --collect-all numpy --collect-all parselmouth --collect-all i18n_pkg --collect-all csgpr%OPTIONAL_ASSET_FLAG% --add-data \"icon.ico;.\" --icon=\"%ICON%\" \"%APP%\""
 
 echo.
 pause

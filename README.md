@@ -96,7 +96,7 @@ Every run now drops a timestamped log inside `logs/` (for example, `logs/build_2
 When finished, your app will be inside:
 
 ```
-dist\chromatic_gen_qt_plus_modular_i18n\
+dist\CSGPR\
 ```
 
 If it doesn’t open, use:
@@ -106,6 +106,8 @@ run_with_logs.bat
 ```
 
 to view error logs safely.
+
+> **Tip:** The build script automatically bundles an `assets` folder when it exists. If you don’t ship extra resources, the step is skipped and the build continues with a helpful log message.
 
 ---
 
